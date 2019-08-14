@@ -1,0 +1,76 @@
+{
+	"common": {
+		"name": "wlanthermo-nano",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"zh-cn": "首次出版"
+			}
+		},
+		"title": "WLANThermo-Nano",
+		"titleLang": {
+			"en": "WLANThermo-Nano",
+			"de": "WLANThermo-Nano",
+			"ru": "WLANThermo-Nano",
+			"pt": "WLANThermo-Nano",
+			"nl": "WLANThermo-Nano",
+			"fr": "WLANThermo-Nano",
+			"it": "WLANThermo-Nano",
+			"es": "WLANThermo-Nano",
+			"pl": "WLANThermo-Nano",
+			"zh-cn": "WLANThermo纳"
+		},
+		"desc": {
+			"en": "WLANThermo Nano, the digital advantage for your barbecue sport",
+			"de": "WLANThermo Nano, der digitale Vorteil für Ihren Grillsport",
+			"ru": "WLANThermo Nano, цифровое преимущество для вашего барбекю спорта",
+			"pt": "WLANThermo Nano, a vantagem digital para o seu esporte de churrasco",
+			"nl": "WLANThermo Nano, het digitale voordeel voor uw barbecuesport",
+			"fr": "WLANThermo Nano, l'avantage numérique de votre sport de barbecue",
+			"it": "WLANThermo Nano, il vantaggio digitale per il tuo sport barbecue",
+			"es": "WLANThermo Nano, la ventaja digital para tu deporte de barbacoa",
+			"pl": "WLANThermo Nano, cyfrowa zaleta dla Twojego grilla",
+			"zh-cn": "WLANThermo Nano，为您的烧烤运动提供数字优势"
+		},
+		"authors": [
+			"DutchmanNL <rdrozda86@gmail.com>"
+		],
+		"keywords": [
+			"WLANThermo",
+			"barbecue",
+			"sensor"
+		],
+		"license": "MIT",
+		"platform": "Javascript/Node.js",
+		"main": "main.js",
+		"icon": "wlanthermo-nano.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.wlanthermo-nano/master/admin/wlanthermo-nano.png",
+		"readme": "https://github.com/iobroker-community-adapters/ioBroker.wlanthermo-nano/blob/master/README.md",
+		"loglevel": "info",
+		"mode": "daemon",
+		"type": "household",
+		"compact": true,
+		"materialize": true,
+		"dependencies": [
+			{
+				"js-controller": ">=1.4.2"
+			}
+		]
+	},
+	"native": {
+		"option1": true,
+		"option2": "42"
+	},
+	"objects": [],
+	"instanceObjects": []
+}
