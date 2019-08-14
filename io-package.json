@@ -1,9 +1,9 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.0.1",
+		"version": "0.0.2",
 		"news": {
-			"0.0.1": {
+			"0.0.2": {
 				"en": "initial release",
 				"de": "Erstveröffentlichung",
 				"ru": "Начальная версия",
@@ -68,8 +68,12 @@
 		]
 	},
 	"native": {
-		"option1": true,
-		"option2": "42"
+		"receive_1": 192,
+		"receive_2": 168,
+		"receive_3": 1,
+		"receive_4": 50,
+		"receive_port": 80,
+		"Time_Sync" : 10
 	},
 	"objects": [],
 	"instanceObjects": []

@@ -65,27 +65,43 @@
 
 	<div class="m adapter-container">
 
-		<div class="row">
-			<div class="col s12 m4 l2">
-				<img src="wlanthermo-nano.png" class="logo">
-			</div>
-		</div>
-
 		<!-- Put your content here -->
+		<h1 class="translate">WLANThermo adapter settings</h1>
 
-		<!-- For example columns with settings: -->
+		<!-- For example two columns with settings: -->
+		
+		<div class="section">
+			<h6 class="translate">ip-adress of WLANThermo</h6>
+		 </div>		
 		<div class="row">
-			<div class="col s6 input-field">
-				<input type="checkbox" class="value" id="option1" />
-				<label for="option1" class="translate">option1</label>
+			<div class="input-field col s1">
+				<input type="number" id="receive_1" class="value" min="0" max="254"/>
 			</div>
-
-			<div class="col s6 input-field">
-				<input type="text" class="value" id="option2" />
-				<label for="option2" class="translate">option2</label>
+			<div class="input-field col s1">
+				<input type="number" id="receive_2" class="value" min="0" max="254"/>
+			</div>
+			<div class="input-field col s1">
+				<input type="number" id="receive_3" class="value" min="0" max="254"/>
+			</div>
+			<div class="input-field col s1">
+				<input type="number" id="receive_4" class="value" min="0" max="254"/>
+			</div>
+			<div class="input-field col s1">
+			</div>
+			<div class="input-field col s2">
+				<input type="number" id="receive_port" class="value" min="0" max="65565"/>
+				<label for="port" class="translate">Adapter Port</label>
 			</div>
 		</div>
-
+		<div class="section">
+			<h6 class="translate">Time Syncronisation intervall</h6>
+		 </div>		
+		<div class="row">
+			<div class="input-field col s2">
+				<input type="number" id="Time_Sync" class="value" min="0" max="12000"/>
+				<label for="Time_Sync" class="translate">Intervall in seconds</label>
+			</div>
+		</div>
 	</div>
 
 </body>
