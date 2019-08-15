@@ -8,6 +8,7 @@
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
+
 let data, settings, unit_device, connection_error, intervall, initialise; // , info, networklist; ==> these options from APi are currenlty not used
 
 // Load your modules here, e.g.:
@@ -38,6 +39,7 @@ class WlanthermoNano extends utils.Adapter {
 		
 		// Set  initialise variable to ensure state creation is only handled once
 		initialise = true;
+		this.intervall();
 		
 		const intervall_time = this.config.Time_Sync * 1000;
 		intervall = setInterval( () => {
@@ -79,28 +81,48 @@ class WlanthermoNano extends utils.Adapter {
 
 	async get_http(){
 		try {
+			const user = this.config.Username;
+			let pass = this.config.Password;
 
-			const url = 'http://' + this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port;
-			this.log.debug('URL : ' + url);
-			const response_data = await axios(url + '/data');
-			this.log.debug(response_data);
-			data = response_data.data;	
-			this.log.debug('Data from get_http function : ' + JSON.stringify(data));
+			// Check if credentials are not empty
+			if (user !== '' && pass !== ''){
+				this.getForeignObject('system.config', (err, obj) => {
+					if (obj && obj.native && obj.native.secret) {
+					//noinspection JSUnresolvedVariable
+						pass = this.decrypt(obj.native.secret, this.config.Password);
+					} else {
+					//noinspection JSUnresolvedVariable
+						pass = this.decrypt('Zgfr56gFe87jJOM', this.config.Password);
+					}
+								
+				});
 
-			const response_settings = await axios(url + '/settings');
-			settings = response_settings.data;
-			this.log.debug('Settings from get_http function : ' + JSON.stringify(settings));			
+				const url = 'http://' + user + ':' + pass + '@'+ this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port;
+				this.log.debug('URL : ' + url);
+				const response_data = await axios(url + '/data');
+				this.log.debug(response_data);
+				data = response_data.data;	
+				this.log.debug('Data from get_http function : ' + JSON.stringify(data));
+	
+				const response_settings = await axios(url + '/settings');
+				settings = response_settings.data;
+				this.log.debug('Settings from get_http function : ' + JSON.stringify(settings));			
+	
+				// API present but information not interesting to be used, disabled
+				// const response_info = await axios('http://91.40.191.99:9999/info');
+				// info = response_info.data;
+				// this.log.debug('Info from get_http function : ' + JSON.stringify(info));
+	
+				// const_response_networklist = await axios('http://91.40.191.99:9999/networklist');
+				// networklist = response_networklist.data;
+				// this.log.debug('Networklist from get_http function : ' + JSON.stringify(networklist));		
+	
+				connection_error = false;
 
-			// API present but information not interesting to be used, disabled
-			// const response_info = await axios('http://91.40.191.99:9999/info');
-			// info = response_info.data;
-			// this.log.debug('Info from get_http function : ' + JSON.stringify(info));
-
-			// const_response_networklist = await axios('http://91.40.191.99:9999/networklist');
-			// networklist = response_networklist.data;
-			// this.log.debug('Networklist from get_http function : ' + JSON.stringify(networklist));		
-
-			connection_error = false;
+			} else {
+				this.log.error('*** Adapter deactivated, credentials missing in Adaptper Settings !!!  ***');
+				this.setForeignState('system.adapter.' + this.namespace + '.alive', false);
+			}
 
 		} catch (e) {
 			this.log.debug(e);
@@ -121,6 +143,8 @@ class WlanthermoNano extends utils.Adapter {
 	async create_states(){
 		
 		// Read all info related settings and write to states
+
+		// Create info channel
 		for (const i in settings.device){
 
 			// Get type values for state
@@ -155,6 +179,49 @@ class WlanthermoNano extends utils.Adapter {
 				});
 			}
 			this.setState(settings.device['serial'] + '.Info.' + i,{ val: settings.device[i] ,ack: true });			
+		}
+
+		// Create system channel 
+		for (const i in settings.system){
+
+			// Get type values for state
+			if (initialise){ 
+				
+				let attr = await this.define_state_att (i);
+				if (attr === undefined) {
+
+					attr = {
+						type: 'number',
+						role: '',
+						unit: '',
+						read: true,
+						write: false,
+					};
+
+				}
+
+				this.log.debug(settings.system[i]);
+				this.log.debug(i);
+
+				await this.setObjectNotExistsAsync(settings.device['serial'] + '.Configuration.' + i, {
+					type: 'state',
+					common: {
+						name: i,
+						read: attr.read,
+						write: attr.write,
+						role: attr.role,
+						unit: attr.unit ,
+					},
+					native: {},
+				});
+				
+				// Subscribe state for changes (only when writable !)
+				if (attr.write === true){
+					this.subscribeStates(settings.device['serial'] + '.Configuration.' + i);
+				}
+			}
+			this.setState(settings.device['serial'] + '.Configuration.' + i,{ val: settings.system[i] ,ack: true });
+						
 		}
 
 		// Read all sensor related settings and write to states
@@ -295,6 +362,17 @@ class WlanthermoNano extends utils.Adapter {
 				};
 				break;
 
+			case 'ap':
+				this.log.debug('Case result : ap');
+				objekt = {
+					type: 'mixed',
+					role: 'info',
+					unit: '',
+					read: true,
+					write: true,
+				};
+				break;
+
 			case 'api_version':
 				this.log.debug('Case result : api_version');
 				objekt = {
@@ -303,6 +381,17 @@ class WlanthermoNano extends utils.Adapter {
 					unit: '',
 					read: true,
 					write: false,
+				};
+				break;
+
+			case 'autoupd':
+				this.log.debug('Case result : autoupd');
+				objekt = {
+					type: 'bolean',
+					role: 'info.status',
+					unit: '',
+					read: true,
+					write: true,
 				};
 				break;
 
@@ -339,8 +428,41 @@ class WlanthermoNano extends utils.Adapter {
 				};
 				break;
 
+			case 'god':
+				this.log.debug('Case result : god');
+				objekt = {
+					type: 'number',
+					role: 'info',
+					unit: '',
+					read: true,
+					write: false,
+				};
+				break;
+
+			case 'host':
+				this.log.debug('Case result : host');
+				objekt = {
+					type: 'mixed',
+					role: 'info.hostname',
+					unit: '',
+					read: true,
+					write: true,
+				};
+				break;
+
 			case 'hw_version':
 				this.log.debug('Case result : hw_version');
+				objekt = {
+					type: 'mixed',
+					role: 'info.hw_version',
+					unit: '',
+					read: true,
+					write: false,
+				};
+				break;
+
+			case 'hwversion':
+				this.log.debug('Case result : hwversion');
 				objekt = {
 					type: 'mixed',
 					role: 'info.hw_version',
@@ -366,6 +488,17 @@ class WlanthermoNano extends utils.Adapter {
 				objekt = {
 					type: 'number',
 					role: 'info.id',
+					unit: '',
+					read: true,
+					write: false,
+				};
+				break;
+
+			case 'getupdate':
+				this.log.debug('Case result : getupdate');
+				objekt = {
+					type: 'mixed',
+					role: 'info.status',
 					unit: '',
 					read: true,
 					write: false,
@@ -493,14 +626,36 @@ class WlanthermoNano extends utils.Adapter {
 				};
 				break;
 
+			case 'time':
+				this.log.debug('Case result : time');
+				objekt = {
+					type: 'mixed',
+					role: 'value.time',
+					unit: '',
+					read: true,
+					write: false,
+				};
+				break;
+
 			case 'typ':
 				this.log.debug('Case result : typ');
 				objekt = {
-					type: 'number',
+					type: 'mixed',
 					role: 'info.typ',
 					unit: '',
 					read: true,
 					write: false,
+				};
+				break;
+
+			case 'unit':
+				this.log.debug('Case result : unit');
+				objekt = {
+					type: 'mixed',
+					role: 'info.unit',
+					unit: '',
+					read: true,
+					write: true,
 				};
 				break;
 
@@ -526,6 +681,17 @@ class WlanthermoNano extends utils.Adapter {
 				};
 				break;
 
+			case 'version':
+				this.log.debug('Case result : version');
+				objekt = {
+					type: 'mixed',
+					role: 'info.version',
+					unit: '',
+					read: true,
+					write: false,
+				};
+				break;
+
 			default:
 				this.log.error('Error in case handling of type identificaton : ' + state);
 				return;
@@ -533,6 +699,16 @@ class WlanthermoNano extends utils.Adapter {
 
 		return objekt;
 
+	}
+
+	// Function to decrypt passwords
+	decrypt(key, value) {
+		let result = '';
+		for (let i = 0; i < value.length; ++i) {
+			result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
+		}
+		this.log.debug('client_secret decrypt ready');
+		return result;
 	}
 
 	/**
@@ -568,10 +744,89 @@ class WlanthermoNano extends utils.Adapter {
 	 * @param {string} id
 	 * @param {ioBroker.State | null | undefined} state
 	 */
-	onStateChange(id, state) {
+	async onStateChange(id, state) {
+		const user = this.config.Username;
+		let pass = this.config.Password;
+
 		if (state) {
 			// The state was changed
-			this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+
+			//Only fire when ack = false (set by admin or script)
+			if (state.ack === false){
+
+				this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+				const deviceId = id.split(".");
+				this.log.error(deviceId[3]);
+				this.log.error(deviceId);
+				if(deviceId[3] === 'Configuration'){
+
+					this.log.info('Change in configuration settings')
+
+					const ap  = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'ap');
+					this.log.info(ap.val);
+					const host = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'host');
+					this.log.info(host.val);
+					const language = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'language');
+					this.log.info(language.val);
+					const unit = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'unit');
+					this.log.info(unit.val);
+					// const hwalarm  = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'hwalarm');
+					// this.log.info(hwalarm);
+					// const fastmode = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'fastmode');
+					// this.log.info(fastmode);
+					const autoupd = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'autoupd');
+					this.log.info(autoupd.val);
+					const hwversion =  await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'hwversion');
+					this.log.info(hwversion.val);
+
+					const array = {
+						'ap': ap.val,
+						'host': host.val,
+						'language': language.val,
+						'unit': unit.val,
+						// 'hwalarm': false,
+						// 'fastmode': false,
+						'autoupd': autoupd.val,
+						'hwversion': hwversion.val
+					};
+
+					this.log.error(JSON.stringify(array));
+					
+					const url = 'http://' + user + ':' + pass + '@'+ this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port; + '/setsystem';
+					if (user !== "" && pass !== ""){
+						this.getForeignObject("system.config", (err, obj) => {
+							if (obj && obj.native && obj.native.secret) {
+							//noinspection JSUnresolvedVariable
+								pass = this.decrypt(obj.native.secret, this.config.Password);
+							} else {
+							//noinspection JSUnresolvedVariable
+								pass = this.decrypt("Zgfr56gFe87jJOM", this.config.Password);
+							}
+					
+						});
+					} else {
+						this.log.error("*** Adapter deactivated, credentials missing in Adaptper Settings !!!  ***");
+						this.setForeignState("system.adapter." + this.namespace + ".alive", false);
+					}
+
+					const post_url = 'http://' + user + ':' + 'admin' + '@'+ this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port + '/setsystem';
+					this.log.info(post_url);
+					axios.post(post_url, {
+						'ap': ap.val,
+						'host': host.val,
+						'language': language.val,
+						'unit': unit.val,
+						// 'hwalarm': false,
+						// 'fastmode': false,
+						'autoupd': autoupd.val,
+						'hwversion': hwversion.val
+					});
+
+					this.log.error('message send');
+
+				}
+			}
+
 		} else {
 			// The state was deleted
 			this.log.info(`state ${id} deleted`);

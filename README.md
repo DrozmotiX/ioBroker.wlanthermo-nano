@@ -17,6 +17,9 @@ WLANThermo Nano, the digital advantage for your barbecue sport
 
 ## Changelog
 
+### 0.0.3
+* (DutchmanNL) implement secure storage of login credentials (required to enable setting changes later)
+
 ### 0.0.2
 * (DutchmanNL) initial release
 

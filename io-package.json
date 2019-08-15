@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.0.2",
+		"version": "0.0.3",
 		"news": {
 			"0.0.2": {
 				"en": "initial release",
@@ -68,6 +68,8 @@
 		]
 	},
 	"native": {
+		"Username": "",
+		"Password": "",
 		"receive_1": 192,
 		"receive_2": 168,
 		"receive_3": 1,
