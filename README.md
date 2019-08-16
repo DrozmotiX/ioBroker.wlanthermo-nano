@@ -14,8 +14,27 @@
 
 WLANThermo Nano, the digital advantage for your barbecue sport
 
+## Configuration
+
+The adapter can be installed and configured within the admin interface.
+Please enter IP-adress, username and password in the instance configuration.
+
+Currenlty 1 device is supported, if you want to monitor a secode device please user en second instance.
+(in future release mutliple devices by 1 adapter will be supported).
+
 
 ## Changelog
+
+### 0.0.6
+* (DutchmanNL) make type and alarm selectable with dropdown
+
+### 0.0.5
+* (DutchmanNL) add  capability to change sensors
+
+### 0.0.4
+* (DutchmanNL) Fix issue with password set
+* (DutchmanNL) Implemented new states for config (reboot/update/checkupdate)
+* (DutchmanNL) Change  configuration (way of ip-adress, also dyndns now supported)
 
 ### 0.0.3
 * (DutchmanNL) implement secure storage of login credentials (required to enable setting changes later)

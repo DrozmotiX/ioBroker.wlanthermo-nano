@@ -296,18 +296,49 @@ class WlanthermoNano extends utils.Adapter {
 								write: attr.write,
 								role: attr.role,
 								unit: attr.unit ,
-								// 'states': {
-								// 	'0': 'AUTO-MODE',
-								// 	'1': 'MANU-MODE',
-								// 	'2': 'PARTY-MODE',
-								// 	'3': 'BOOST-MODE'
-								// },
+								'states': {
+									'0': 'Maverick',
+									'1': 'Fantast-Neu',
+									'2': 'Fantast',
+									'3': 'iGrill2',
+									'4': 'ET-73',
+									'5': 'Perfektion',
+									'6': '50K',
+									'7': 'Inkbird',
+									'8': '100K6A1B',
+									'9': 'Weber_6743',
+									'10': 'Santos'
+								},
 								def: 0,
 							},
 							native: {},
 						});
 					}
 					this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
+
+				} else if (y === 'alarm') {
+
+				if (initialise){ 
+					await this.setObjectNotExistsAsync(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y, {
+						type: 'state',
+						common: {
+							name: y,
+							read: attr.read,
+							write: attr.write,
+							role: attr.role,
+							unit: attr.unit ,
+							'states': {
+								'0': 'Disabled',
+								'1': 'Push-Only',
+								'2': 'Speaker-Only',
+								'4': 'Push & Speaker'
+							},
+							def: 0,
+						},
+						native: {},
+					});
+				}
+				this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
 
 				} else {
 
