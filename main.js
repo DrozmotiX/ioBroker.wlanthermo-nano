@@ -470,6 +470,14 @@ class WlanthermoNano extends utils.Adapter {
 					}
 					this.setState(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
 					
+				} else if (y === 'set_color'){
+
+					// ignore set_color
+
+				} else if (y === 'value_color'){
+
+					// ignore set_color
+
 				} else {
 				
 					if (initialise){ 
