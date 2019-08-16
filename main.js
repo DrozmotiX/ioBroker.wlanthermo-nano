@@ -125,6 +125,7 @@ class WlanthermoNano extends utils.Adapter {
 			});
 			this.createChannel(settings.device['serial'],'Sensors');
 			this.createChannel(settings.device['serial'],'Info');
+			this.createChannel(settings.device['serial'],'Pitmaster');
 		}
 	}	
 
@@ -367,9 +368,10 @@ class WlanthermoNano extends utils.Adapter {
 		}
 
 		// Read pidmaster values
+
 		for (const i in data.pitmaster.pm){
 
-			await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)), {
+			await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)), {
 				type: 'channel',
 				common: {
 					name: 'Pitmaster',
@@ -380,40 +382,87 @@ class WlanthermoNano extends utils.Adapter {
 
 			for (const y in data.pitmaster.pm[i]){
 
-				if (initialise){ 
-					let attr = await this.define_state_att (y);
+				if (y === 'typ'){
 
-					if (attr === undefined) {
+					if (initialise){ 
 
-						attr = {
-							type: 'number',
-							role: '',
-							unit: '',
-							read: true,
-							write: false,
-						};
+						let attr = await this.define_state_att (y);
+
+						if (attr === undefined) {
+
+							attr = {
+								type: 'number',
+								role: '',
+								unit: '',
+								read: true,
+								write: false,
+							};
+
+						}
+						
+						await this.setObjectNotExistsAsync(settings.device['serial']+ '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus', {
+							type: 'state',
+							common: {
+								name: 'modus',
+								read: attr.read,
+								write: attr.write,
+								role: attr.role,
+								unit: attr.unit ,
+								'states': {
+									'0': 'off',
+									'1': 'manual',
+									'2': 'auto'
+								},
+								def: 0,
+							},
+							native: {},
+						});
+
+						// Subscribe on state  if writeable
+						if (attr.write === true){
+							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus');
+						}
 
 					}
-					await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y, {
-						type: 'state',
-						common: {
-							name: y,
-							read: attr.read,
-							write: attr.write,
-							role: attr.role,
-							unit: attr.unit,
-							def: 0,
-						},
-						native: {},
-					});
+					this.setState(settings.device['serial']+ '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus',{ val: data.pitmaster.pm[i][y] ,ack: true });
+					
+				} else {
 				
-					// Subscribe on state  if writeable
-					if (attr.write === true){
-						this.subscribeStates(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
-					}
+					if (initialise){ 
+						let attr = await this.define_state_att (y);
 
+						if (attr === undefined) {
+
+							attr = {
+								type: 'number',
+								role: '',
+								unit: '',
+								read: true,
+								write: false,
+							};
+
+						}
+						await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y, {
+							type: 'state',
+							common: {
+								name: y,
+								read: attr.read,
+								write: attr.write,
+								role: attr.role,
+								unit: attr.unit,
+								def: 0,
+							},
+							native: {},
+						});
+					
+						// Subscribe on state  if writeable
+						if (attr.write === true){
+							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
+						}
+
+					}
+					this.setState(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
 				}
-				this.setState(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
 			}
 		}
 	}
@@ -661,7 +710,7 @@ class WlanthermoNano extends utils.Adapter {
 				objekt = {
 					type: 'number',
 					role: 'value',
-					unit: '%',
+					unit: unit_device,
 					read: true,
 					write: false,
 				};
@@ -672,7 +721,7 @@ class WlanthermoNano extends utils.Adapter {
 				objekt = {
 					type: 'mixed',
 					role: 'level.color.rgb',
-					unit: '%',
+					unit: '',
 					read: true,
 					write: true,
 				};
@@ -749,7 +798,7 @@ class WlanthermoNano extends utils.Adapter {
 				objekt = {
 					type: 'mixed',
 					role: 'level.color.rgb',
-					unit: '%',
+					unit: '',
 					read: true,
 					write: false,
 				};
@@ -884,6 +933,36 @@ class WlanthermoNano extends utils.Adapter {
 
 					this.log.debug(JSON.stringify(array));
 					this.send_array(array,'/setchannels');
+
+				} else {
+
+					try {
+
+						// assuming else is always pitmaster related : To-Do = implement check in next version
+						this.log.debug('Change in sensor settings' + deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +  '.' + 'number')
+
+						const id = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'id');
+						const channel = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'channel');
+						const pid = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'pid');
+						const value = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'value');
+						const set = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'set');
+						const modus =  await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'modus');					
+						const array = [{
+							'id': id.val,
+							'channel': channel.val,
+							'pid': pid.val,
+							'value': value.val,
+							'set': set.val,
+							'typ': modus.val,
+						}];
+
+						this.log.debug(JSON.stringify(array));
+						this.send_array(array,'/setpitmaster');
+
+					} catch (e) {
+						this.log.error('Error in handling pitmaster state change')
+						this.log.error(e);
+					}
 
 				}
 			}
