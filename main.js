@@ -426,6 +426,50 @@ class WlanthermoNano extends utils.Adapter {
 					}
 					this.setState(settings.device['serial']+ '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus',{ val: data.pitmaster.pm[i][y] ,ack: true });
 					
+				} else if (y === 'pid'){
+
+					if (initialise){ 
+
+						let attr = await this.define_state_att (y);
+
+						if (attr === undefined) {
+
+							attr = {
+								type: 'number',
+								role: '',
+								unit: '',
+								read: true,
+									write: false,
+							};
+
+						}
+						
+						await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y, {
+							type: 'state',
+							common: {
+								name: y,
+								read: attr.read,
+								write: attr.write,
+								role: attr.role,
+								unit: attr.unit ,
+								'states': {
+									'0': 'SSR SousVide"',
+									'1': 'TITAN 50x50',
+									'2': 'Kamado 50x50'
+								},
+								def: 0,
+							},
+							native: {},
+						});
+
+						// Subscribe on state  if writeable
+						if (attr.write === true){
+							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
+						}
+
+					}
+					this.setState(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
+					
 				} else {
 				
 					if (initialise){ 

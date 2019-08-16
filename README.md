@@ -25,6 +25,9 @@ Currenlty 1 device is supported, if you want to monitor a secode device please u
 
 ## Changelog
 
+### 0.0.9
+* (DutchmanNL) optimize pid profile setting
+
 ### 0.0.8
 * (DutchmanNL) fix post command for pitmaster
 

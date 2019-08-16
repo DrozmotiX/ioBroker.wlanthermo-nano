@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.0.8",
+		"version": "0.0.9",
 		"news": {
 			"0.0.2": {
 				"en": "initial release",
