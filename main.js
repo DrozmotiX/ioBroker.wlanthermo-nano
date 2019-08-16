@@ -409,9 +409,9 @@ class WlanthermoNano extends utils.Adapter {
 								role: attr.role,
 								unit: attr.unit ,
 								'states': {
-									'0': 'off',
-									'1': 'manual',
-									'2': 'auto'
+									'off': 'off',
+									'manual': 'manual',
+									'auto': 'auto'
 								},
 								def: 0,
 							},
@@ -690,7 +690,7 @@ class WlanthermoNano extends utils.Adapter {
 					role: 'info.pid',
 					unit: '',
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
@@ -712,7 +712,7 @@ class WlanthermoNano extends utils.Adapter {
 					role: 'value',
 					unit: unit_device,
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
@@ -789,7 +789,7 @@ class WlanthermoNano extends utils.Adapter {
 					role: 'value',
 					unit: '',
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
