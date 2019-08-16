@@ -12,7 +12,7 @@
 
 ## wlanthermo-nano adapter for ioBroker
 
-WLANThermo Nano, the digital advantage for your barbecue sport
+[WLANThermo Nano](https://github.com/WLANThermo-nano/WLANThermo_nano_Software/wiki "WLANThermo Nano"), the digital advantage for your barbecue sport
 
 ## Configuration
 
@@ -22,6 +22,11 @@ Please enter IP-adress, username and password in the instance configuration.
 Currenlty 1 device is supported, if you want to monitor a secode device please user en second instance.
 (in future release mutliple devices by 1 adapter will be supported).
 
+## To-Do
+
+* [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
+* [ ] allow multiple devices
+* [ ] code cleanup
 
 ## Changelog
 
