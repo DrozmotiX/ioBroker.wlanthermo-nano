@@ -24,7 +24,6 @@ class WlanthermoNano extends utils.Adapter {
 			name: 'wlanthermo-nano',
 		});
 		this.on('ready', this.onReady.bind(this));
-		this.on('objectChange', this.onObjectChange.bind(this));
 		this.on('stateChange', this.onStateChange.bind(this));
 		// this.on('message', this.onMessage.bind(this));
 		this.on('unload', this.onUnload.bind(this));
@@ -41,21 +40,21 @@ class WlanthermoNano extends utils.Adapter {
 		user = this.config.Username;
 		pass  = this.config.Password;
 
-		this.log.debug("Encrypted Password : " + pass);
+		this.log.debug('Encrypted Password : ' + pass);
 
 		// Check if credentials are not empty
-		if (user !== "" && pass !== ""){
-			this.getForeignObject("system.config", (err, obj) => {
+		if (user !== '' && pass !== ''){
+			this.getForeignObject('system.config', (err, obj) => {
 				if (obj && obj.native && obj.native.secret) {
 				//noinspection JSUnresolvedVariable
 					pass = this.decrypt(obj.native.secret, this.config.Password);
 				} else {
 				//noinspection JSUnresolvedVariable
-					pass = this.decrypt("Zgfr56gFe87jJOM", this.config.Password);
+					pass = this.decrypt('Zgfr56gFe87jJOM', this.config.Password);
 				}
 
 				// showing password in debug disabled for security reasons
-				// this.log.debug("Decrypted Password : " + pass);
+				// this.log.debug('Decrypted Password : ' + pass);
 
 				// Set  initialise variable to ensure state creation is only handled once
 				initialise = true;
@@ -71,8 +70,8 @@ class WlanthermoNano extends utils.Adapter {
 
 			});
 		} else {
-			this.log.error("*** Adapter deactivated, credentials missing in Adaptper Settings !!!  ***");
-			this.setForeignState("system.adapter." + this.namespace + ".alive", false);
+			this.log.error('*** Adapter deactivated, credentials missing in Adaptper Settings !!!  ***');
+			this.setForeignState('system.adapter.' + this.namespace + '.alive', false);
 		}
 
 	}
@@ -180,7 +179,7 @@ class WlanthermoNano extends utils.Adapter {
 				type: 'number',
 				read: true,
 				write: true,
-				role: "button",
+				role: 'button',
 			},
 			native: {},
 		});
@@ -192,7 +191,7 @@ class WlanthermoNano extends utils.Adapter {
 				type: 'number',
 				read: true,
 				write: true,
-				role: "button",
+				role: 'button',
 			},
 			native: {},
 		});
@@ -204,7 +203,7 @@ class WlanthermoNano extends utils.Adapter {
 				type: 'number',
 				read: true,
 				write: true,
-				role: "button",
+				role: 'button',
 			},
 			native: {},
 		});
@@ -326,6 +325,11 @@ class WlanthermoNano extends utils.Adapter {
 							native: {},
 						});
 					}
+
+					// Subscribe on state  if writeable
+					if (attr.write === true){
+						this.subscribeStates(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y);
+					}
 					this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
 				}
 			}	
@@ -371,6 +375,12 @@ class WlanthermoNano extends utils.Adapter {
 						},
 						native: {},
 					});
+				
+					// Subscribe on state  if writeable
+					if (attr.write === true){
+						this.subscribeStates(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
+					}
+
 				}
 				this.setState(settings.device['serial'] + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
 			}
@@ -387,11 +397,11 @@ class WlanthermoNano extends utils.Adapter {
 			case 'alarm':
 				this.log.debug('Case result : alarm');
 				objekt = {
-					type: 'number',
+					type: 'boolean',
 					role: 'sensor.alarm',
 					unit: '',
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
@@ -578,7 +588,7 @@ class WlanthermoNano extends utils.Adapter {
 					role: 'info.name',
 					unit: '',
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
@@ -677,7 +687,7 @@ class WlanthermoNano extends utils.Adapter {
 					role: 'info.typ',
 					unit: '',
 					read: true,
-					write: false,
+					write: true,
 				};
 				break;
 
@@ -758,21 +768,6 @@ class WlanthermoNano extends utils.Adapter {
 	}
 
 	/**
-	 * Is called if a subscribed object changes
-	 * @param {string} id
-	 * @param {ioBroker.Object | null | undefined} obj
-	 */
-	onObjectChange(id, obj) {
-		if (obj) {
-			// The object was changed
-			this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-		} else {
-			// The object was deleted
-			this.log.info(`object ${id} deleted`);
-		}
-	}
-
-	/**
 	 * Is called if a subscribed state changes
 	 * @param {string} id
 	 * @param {ioBroker.State | null | undefined} state
@@ -784,26 +779,26 @@ class WlanthermoNano extends utils.Adapter {
 			//Only fire when ack = false (set by admin or script)
 			if (state.ack === false){
 
-				this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-				const deviceId = id.split(".");
+				this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+				const deviceId = id.split('.');
 
 				this.log.debug('Triggered state : ' + deviceId);
-
+				this.log.debug('Triggered state : ' + deviceId[3]);
 				// Handle Post command for configuration related settings
 				if(deviceId[3] === 'Configuration'){
 
 					this.log.debug('Change in configuration settings')
 
-					const ap  = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'ap');
-					const host = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'host');
-					const language = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'language');
-					const unit = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'unit');
-					// const hwalarm  = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'hwalarm');
+					const ap  = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'ap');
+					const host = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'host');
+					const language = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'language');
+					const unit = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'unit');
+					// const hwalarm  = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'hwalarm');
 					// this.log.info(hwalarm);
-					// const fastmode = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'fastmode');
+					// const fastmode = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'fastmode');
 					// this.log.info(fastmode);
-					const autoupd = await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'autoupd');
-					const hwversion =  await this.getStateAsync(deviceId[2] +  "." + deviceId[3] +  "." + 'hwversion');
+					const autoupd = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'autoupd');
+					const hwversion =  await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + 'hwversion');
 
 					const array = {
 						'ap': ap.val,
@@ -832,20 +827,45 @@ class WlanthermoNano extends utils.Adapter {
 						this.log.debug('Device update requested');
 					}
 					this.log.debug(JSON.stringify(array));
-					this.send_array(array);
+					this.send_array(array,'/setsystem');
+				
+				// Handle Post command for sensor related settings
+				} else if (deviceId[3] === 'Sensors'){
+
+					this.log.debug('Change in sensor settings' + deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +  '.' + 'number')
+
+					const number  = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'number');
+					const name = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'name');
+					const typ = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'typ');
+					const min = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'min');
+					const max = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'max');
+					const alarm = await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'alarm');
+					const color =  await this.getStateAsync(deviceId[2] +  '.' + deviceId[3] +  '.' + deviceId[4] +   '.' + 'color');					
+					const array = {
+						'number': number.val,
+						'name': name.val,
+						'typ': typ.val,
+						'min': min.val,
+						'max': max.val,
+						'alarm': alarm.val,
+						'color': color.val
+					  };
+
+					this.log.debug(JSON.stringify(array));
+					this.send_array(array,'/setchannels');
+
 				}
 			}
 
 		} else {
 			// The state was deleted
-			this.log.info(`state ${id} deleted`);
+			this.log.debug(`state ${id} deleted`);
 		}
 	}
 
-	send_array(array){
-		this.log.info(user + "..." + pass);
+	send_array(array, type){
 
-			const post_url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port + '/setsystem';
+			const post_url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port + type;
 			axios.post(post_url, array);
 
 	}

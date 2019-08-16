@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.0.4",
+		"version": "0.0.5",
 		"news": {
 			"0.0.2": {
 				"en": "initial release",
@@ -68,8 +68,8 @@
 		]
 	},
 	"native": {
-		"Username": "",
-		"Password": "",
+		"Username": "admin",
+		"Password": "admin",
 		"IP": "192.168.1.50",
 		"receive_port": 80,
 		"Time_Sync" : 10
