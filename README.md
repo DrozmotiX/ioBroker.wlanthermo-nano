@@ -4,6 +4,7 @@
 [![NPM version](http://img.shields.io/npm/v/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
 [![Dependency Status](https://img.shields.io/david/iobroker-community-adapters/iobroker.wlanthermo-nano.svg)](https://david-dm.org/iobroker-community-adapters/iobroker.wlanthermo-nano)
+![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-installed.svg) ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.sourceanalytix.svg)](https://www.npmjs.com/package/
 [![Known Vulnerabilities](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano/badge.svg)](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano)
 
 [![NPM](https://nodei.co/npm/iobroker.wlanthermo-nano.png?downloads=true)](https://nodei.co/npm/iobroker.wlanthermo-nano/)
@@ -29,6 +30,12 @@ Currenlty 1 device is supported, if you want to monitor a secode device please u
 * [ ] code cleanup
 
 ## Changelog
+
+### 0.1.1
+* (DutchmanNL) Code optimalisation
+* (DutchmanNL) Implement state_attr.js to handle state options outside of source code
+* (DutchmanNL) Optimised state creation in 1 function
+* (DutchmanNL) Small cleanups
 
 ### 0.1.0
 * (DutchmanNL) remove color settngs from pitmaster

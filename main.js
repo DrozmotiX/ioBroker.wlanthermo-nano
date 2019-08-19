@@ -9,9 +9,10 @@
 
 // Load your modules here, e.g.:
 const utils = require('@iobroker/adapter-core');
+const state_attr = require(__dirname + '/lib/state_attr.js');
 const axios = require('axios');
 
-let data, settings, unit_device, intervall, initialise, user, pass // , info, networklist; ==> these options from APi are currenlty not used
+let data, settings, unit_device, intervall, initialise, user, pass; // , info, networklist; ==> these options from APi are currenlty not used
 
 class WlanthermoNano extends utils.Adapter {
 
@@ -35,7 +36,7 @@ class WlanthermoNano extends utils.Adapter {
 	async onReady() {
 
 		this.log.info('startet, state refresh every ' + this.config.Time_Sync + ' seconds');
-		
+
 		// Read some required master configuration items
 		user = this.config.Username;
 		pass  = this.config.Password;
@@ -53,19 +54,16 @@ class WlanthermoNano extends utils.Adapter {
 					pass = this.decrypt('Zgfr56gFe87jJOM', this.config.Password);
 				}
 
-				// showing password in debug disabled for security reasons
-				// this.log.debug('Decrypted Password : ' + pass);
-
 				// Set  initialise variable to ensure state creation is only handled once
 				initialise = true;
 
 				// Call update routine first time
-				this.get_http(user, pass);
+				this.get_http();
 
 				// Start intervall timer 
 				const intervall_time = this.config.Time_Sync * 1000;
 				intervall = setInterval( () => {
-					this.get_http(user, pass);
+					this.get_http();
 				}, intervall_time);
 
 			});
@@ -76,41 +74,39 @@ class WlanthermoNano extends utils.Adapter {
 
 	}
 
-	async get_http(username, password){
+	async get_http(){
 		try {
 
 			this.log.debug('Get http function started');
-					
-					// const url = 'http://' + user + ':' + 'admin' + '@'+ this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port;
-					// const url = `https://${username}:${password}` + '@' + this.config.receive_1 + '.' + this.config.receive_2 + '.' + this.config.receive_3 + '.' + this.config.receive_4 + ':' + this.config.receive_port;
-					const url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port;
-					this.log.debug('URL : ' + url);
-					this.log.debug('URL build');
-					const response_data = await axios(url + '/data');
-					this.log.debug(response_data);
-					data = response_data.data;	
-					this.log.debug('Data from get_http function : ' + JSON.stringify(data));
-		
-					const response_settings = await axios(url + '/settings');
-					settings = response_settings.data;
-					this.log.debug('Settings from get_http function : ' + JSON.stringify(settings));			
-		
-					unit_device = '°' + settings.system.unit;
+				
+			const url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port;
+			this.log.debug('URL : ' + url);
+			this.log.debug('URL build');
+			const response_data = await axios(url + '/data');
+			this.log.debug(response_data);
+			data = response_data.data;	
+			this.log.debug('Data from get_http function : ' + JSON.stringify(data));
 
-					// API present but information not interesting to be used, disabled
-					// const response_info = await axios('http://91.40.191.99:9999/info');
-					// info = response_info.data;
-					// this.log.debug('Info from get_http function : ' + JSON.stringify(info));
-		
-					// const_response_networklist = await axios('http://91.40.191.99:9999/networklist');
-					// networklist = response_networklist.data;
-					// this.log.debug('Networklist from get_http function : ' + JSON.stringify(networklist));		
+			const response_settings = await axios(url + '/settings');
+			settings = response_settings.data;
+			this.log.debug('Settings from get_http function : ' + JSON.stringify(settings));			
 
-					await this.create_device();
-					await this.create_states();
+			unit_device = '°' + settings.system.unit;
 
-					// Set initialisation to be finalized
-					initialise = false;
+			// API present but information not interesting to be used, disabled
+			// const response_info = await axios('http://91.40.191.99:9999/info');
+			// info = response_info.data;
+			// this.log.debug('Info from get_http function : ' + JSON.stringify(info));
+
+			// const_response_networklist = await axios('http://91.40.191.99:9999/networklist');
+			// networklist = response_networklist.data;
+			// this.log.debug('Networklist from get_http function : ' + JSON.stringify(networklist));		
+
+			await this.create_device();
+			await this.create_states();
+
+			// Set initialisation to be finalized
+			initialise = false;
 
 		} catch (e) {
 			this.log.error('Unable to connect to device, please check IP / port / username and password !')
@@ -136,43 +132,11 @@ class WlanthermoNano extends utils.Adapter {
 		// Create info channel
 		for (const i in settings.device){
 
-			// Get type values for state
-			if (initialise){ 
-				
-				let attr = await this.define_state_att (i);
-				if (attr === undefined) {
-
-					attr = {
-						type: 'number',
-						role: '',
-						unit: '',
-						read: true,
-						write: false,
-					};
-
-				}
-
-				this.log.debug(settings.device[i]);
-				this.log.debug(i);
-
-				await this.setObjectNotExistsAsync(settings.device['serial'] + '.Info.' + i, {
-					type: 'state',
-					common: {
-						name: i,
-						type: attr.type,
-						read: attr.read,
-						write: attr.write,
-						role: attr.role,
-						unit: attr.unit ,
-					},
-					native: {},
-				});
-			}
+			await this.create_states_new(settings.device['serial'] + '.Info.', i);
 			this.setState(settings.device['serial'] + '.Info.' + i,{ val: settings.device[i] ,ack: true });			
 		}
 
 		// Create system channels
-
 		await this.setObjectNotExistsAsync(settings.device['serial'] + '.Configuration.restart', {
 			type: 'state',
 			common: {
@@ -217,74 +181,27 @@ class WlanthermoNano extends utils.Adapter {
 		for (const i in settings.system){
 
 			// Get type values for state
-			if (initialise){ 
-				
-				let attr = await this.define_state_att (i);
-				if (attr === undefined) {
+			this.log.debug(i);				
+			await this.create_states_new(settings.device['serial'] + '.Configuration.', i);
 
-					attr = {
-						type: 'number',
-						role: '',
-						unit: '',
-						read: true,
-						write: false,
-					};
-
-				}
-
-				this.log.debug(settings.system[i]);
-				this.log.debug(i);
-
-				await this.setObjectNotExistsAsync(settings.device['serial'] + '.Configuration.' + i, {
-					type: 'state',
-					common: {
-						name: i,
-						type: attr.type,
-						read: attr.read,
-						write: attr.write,
-						role: attr.role,
-						unit: attr.unit ,
-					},
-					native: {},
-				});
-				
-				// Subscribe state for changes (only when writable !)
-				if (attr.write === true){
-					this.subscribeStates(settings.device['serial'] + '.Configuration.' + i);
-				}
-			}
+			// Write value to state
 			this.setState(settings.device['serial'] + '.Configuration.' + i,{ val: settings.system[i] ,ack: true });
 						
 		}
 
 		// Read all sensor related settings and write to states
 		for (const i in data.channel) {
-			// this.log.info(i);
-			// this.log.info(data.channel[i].name);
 
-			await this.setObjectNotExistsAsync(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)), {
-				type: 'channel',
-				common: {
-					name: data.channel[i].name,
-				},
-				native: {},
-			});
-
+			if (initialise){ 
+				await this.setObjectNotExistsAsync(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)), {
+					type: 'channel',
+					common: {
+						name: data.channel[i].name,
+					},
+					native: {},
+				});
+			}
 			for (const y in data.channel[i]){
-
-				// Get type values for state
-				let attr = await this.define_state_att (y);
-
-				if (attr === undefined) {
-
-					attr = {
-						type: 'number',
-						role: '',
-						unit: '',
-						read: true,
-						write: false,
-					};
-				}
 
 				if (y === 'typ'){
 
@@ -293,10 +210,9 @@ class WlanthermoNano extends utils.Adapter {
 							type: 'state',
 							common: {
 								name: y,
-								read: attr.read,
-								write: attr.write,
-								role: attr.role,
-								unit: attr.unit ,
+								role: state_attr[y].role,
+								read: state_attr[y].read,
+								write: state_attr[y].write,
 								'states': {
 									'0': 'Maverick',
 									'1': 'Fantast-Neu',
@@ -319,49 +235,31 @@ class WlanthermoNano extends utils.Adapter {
 
 				} else if (y === 'alarm') {
 
-				if (initialise){ 
-					await this.setObjectNotExistsAsync(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y, {
-						type: 'state',
-						common: {
-							name: y,
-							read: attr.read,
-							write: attr.write,
-							role: attr.role,
-							unit: attr.unit ,
-							'states': {
-								'0': 'Disabled',
-								'1': 'Push-Only',
-								'2': 'Speaker-Only',
-								'4': 'Push & Speaker'
-							},
-							def: 0,
-						},
-						native: {},
-					});
-				}
-				this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
-
-				} else {
-
 					if (initialise){ 
 						await this.setObjectNotExistsAsync(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y, {
 							type: 'state',
 							common: {
 								name: y,
-								read: attr.read,
-								write: attr.write,
-								role: attr.role,
-								unit: attr.unit,
+								role: state_attr[y].role,
+								read: state_attr[y].read,
+								write: state_attr[y].write,
+								'states': {
+									'0': 'Disabled',
+									'1': 'Push-Only',
+									'2': 'Speaker-Only',
+									'4': 'Push & Speaker'
+								},
 								def: 0,
 							},
 							native: {},
 						});
 					}
+					this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
 
-					// Subscribe on state  if writeable
-					if (attr.write === true){
-						this.subscribeStates(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y);
-					}
+				} else {
+
+					await this.create_states_new(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.', y);
+
 					this.setState(settings.device['serial'] + '.Sensors.Sensor_' + (1 + parseInt(i)) + '.' + y,{ val: data.channel[i][y] ,ack: true });
 				}
 			}	
@@ -385,29 +283,15 @@ class WlanthermoNano extends utils.Adapter {
 				if (y === 'typ'){
 
 					if (initialise){ 
-
-						let attr = await this.define_state_att (y);
-
-						if (attr === undefined) {
-
-							attr = {
-								type: 'number',
-								role: '',
-								unit: '',
-								read: true,
-								write: false,
-							};
-
-						}
 						
 						await this.setObjectNotExistsAsync(settings.device['serial']+ '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus', {
 							type: 'state',
 							common: {
 								name: 'modus',
-								read: attr.read,
-								write: attr.write,
-								role: attr.role,
-								unit: attr.unit ,
+								type: state_attr[y].type,
+								role: state_attr[y].role,
+								read: state_attr[y].read,
+								write: state_attr[y].write,
 								'states': {
 									'off': 'off',
 									'manual': 'manual',
@@ -419,7 +303,7 @@ class WlanthermoNano extends utils.Adapter {
 						});
 
 						// Subscribe on state  if writeable
-						if (attr.write === true){
+						if (state_attr[y].write === true){
 							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus');
 						}
 
@@ -429,29 +313,15 @@ class WlanthermoNano extends utils.Adapter {
 				} else if (y === 'pid'){
 
 					if (initialise){ 
-
-						let attr = await this.define_state_att (y);
-
-						if (attr === undefined) {
-
-							attr = {
-								type: 'number',
-								role: '',
-								unit: '',
-								read: true,
-									write: false,
-							};
-
-						}
 						
 						await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y, {
 							type: 'state',
 							common: {
 								name: y,
-								read: attr.read,
-								write: attr.write,
-								role: attr.role,
-								unit: attr.unit ,
+								type: state_attr[y].type,
+								role: state_attr[y].role,
+								read: state_attr[y].read,
+								write: state_attr[y].write,
 								'states': {
 									'0': 'SSR SousVide"',
 									'1': 'TITAN 50x50',
@@ -463,7 +333,7 @@ class WlanthermoNano extends utils.Adapter {
 						});
 
 						// Subscribe on state  if writeable
-						if (attr.write === true){
+						if (state_attr[y].write === true){
 							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
 						}
 
@@ -480,49 +350,69 @@ class WlanthermoNano extends utils.Adapter {
 
 				} else {
 				
-					if (initialise){ 
-						let attr = await this.define_state_att (y);
-
-						if (attr === undefined) {
-
-							attr = {
-								type: 'number',
-								role: '',
-								unit: '',
-								read: true,
-								write: false,
-							};
-
-						}
-						await this.setObjectNotExistsAsync(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y, {
-							type: 'state',
-							common: {
-								name: y,
-								read: attr.read,
-								write: attr.write,
-								role: attr.role,
-								unit: attr.unit,
-								def: 0,
-							},
-							native: {},
-						});
-					
-						// Subscribe on state  if writeable
-						if (attr.write === true){
-							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
-						}
-
-					}
+					await this.create_states_new(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.', y);
 					this.setState(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y,{ val: data.pitmaster.pm[i][y] ,ack: true });
 				}
 			}
 		}
 	}
+
+	async create_states_new(state_root, name){
+
+		// Only handle state creation at initialisation, better routine to be defined later version > 0.3
+		if (initialise){ 
+			
+			this.log.debug('Stateroot to handle = '  + state_root);
+			this.log.debug('Channel from array = ' + name);
+
+			let set_unit;
+			let set_name;
+
+			if (state_attr[name].name === undefined){
+				set_name = name;
+				this.log.debug('No name defined, using from APi');
+			} else {
+				set_name = state_attr[name].name;
+				this.log.debug('Name defined, take  value from library');
+			}
+			if (state_attr[name].unit === undefined){
+				set_unit = '';
+				this.log.debug('No unit defined, set to zero');
+			} else {
+				set_unit = unit_device;
+				this.log.debug('Unit defined, take  value from system setting');
+			}
+
+			// test attributes  from array
+			const attr_array = {
+				name: set_name,
+				type: state_attr[name].type,
+				role: state_attr[name].role,
+				unit: set_unit,
+				read: state_attr[name].read,
+				write: state_attr[name].write,
+			};
+
+			this.log.debug(settings.device[name]);
+
+			await this.setObjectNotExistsAsync(state_root + name, {
+				type: 'state',
+				common: attr_array,
+				native: {},
+			});
+
+			if (state_attr[name].write === true){
+				this.subscribeStates(state_root + name);
+			}
+
+		}
+
+	}
 	
 	async define_state_att (state){
 
 		let objekt = {};
-
+		this.log.error('Define state att routine used');
 		// Define which calculation factor must be used
 		switch (state) {
 
@@ -981,7 +871,7 @@ class WlanthermoNano extends utils.Adapter {
 						'max': max.val,
 						'alarm': alarm.val,
 						'color': color.val
-					  };
+					};
 
 					this.log.debug(JSON.stringify(array));
 					this.send_array(array,'/setchannels');
@@ -1012,7 +902,7 @@ class WlanthermoNano extends utils.Adapter {
 						this.send_array(array,'/setpitmaster');
 
 					} catch (e) {
-						this.log.error('Error in handling pitmaster state change')
+						this.log.error('Error in handling pitmaster state change');
 						this.log.error(e);
 					}
 
@@ -1027,8 +917,8 @@ class WlanthermoNano extends utils.Adapter {
 
 	send_array(array, type){
 
-			const post_url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port + type;
-			axios.post(post_url, array);
+		const post_url = 'http://' + user + ':' + pass + '@' + this.config.IP + ':' + this.config.receive_port + type;
+		axios.post(post_url, array);
 
 	}
 
