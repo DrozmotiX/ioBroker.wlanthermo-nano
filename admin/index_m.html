@@ -36,6 +36,37 @@
 			return result;
 		}
 
+
+	  // Handle  table
+		var devices = [];
+		function setValue(id, value, onChange) {
+        var $value = $('#' + id + '.value');
+        if ($value.attr('type') === 'checkbox') {
+            $value.prop('checked', value).change(function() {
+                onChange();
+            });
+        } else {
+            $value.val(value).change(function() {
+                onChange();
+            }).keyup(function() {
+                // Check that only numbers entered
+                if ($(this).hasClass('number')) {
+                    var val = $(this).val();
+                    if (val) {
+                        var newVal = '';
+                        for (var i = 0; i < val.length; i++) {
+                            if (val[i] >= '0' && val[i] <= '9') {
+                                newVal += val[i];
+                            }
+                        }
+                        if (val != newVal) $(this).val(newVal);
+                    }
+                }
+                onChange();
+            });
+        }
+	}
+	
 		function loadHelper(settings, onChange) {
       // example: select elements with id=key and class=value and insert value
 			if (!settings) return;
@@ -65,13 +96,21 @@
 		}
 
 		// This will be called by the admin adapter when the settings page loads
-		function load(settings, onChange) {
+		function load(settings, onChange) {	
 			// example: select elements with id=key and class=value and insert value
 			if (!settings) return;
 			socket.emit('getObject', 'system.config', function (err, obj) {
              secret = (obj.native ? obj.native.secret : '') || 'Zgfr56gFe87jJOM';
              loadHelper(settings, onChange);
-   		});
+		   });
+		   
+		   devices = settings.devices || [];
+			for (var key in settings) {
+				if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
+			}
+			values2table('values', devices, onChange);
+
+
 			onChange(false);
 			// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
 //			if (M) M.updateTextFields();
@@ -93,9 +132,10 @@
                  }
                  obj[id] = value;
              }
-         });
-  
-   callback(obj);
+			});
+        // Get edited table
+        obj.devices = table2values('values');
+        callback(obj);
   }
 	</script>
 
@@ -106,11 +146,17 @@
 	<div class="m adapter-container">
 
 		<!-- Put your content here -->
-		<h1 class="translate">WLANThermo adapter settings</h1>
+		<table><tr>
+			<td><img src="wlanthermo-nano.png" width="64px" height="64px"></td>
+			<td style="padding-top: 20px;padding-left: 10px"><h3 class="translate">WLANThermo adapter settings</h3></td>
+		</tr></table>
 
 		<!-- For example two columns with settings: -->
+
+		<!--		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.
 		
-		<div class="section">
+	
+	<div class="section">
 			<h6 class="translate">ip-adress of WLANThermo</h6>
 		</div>
 		
@@ -144,6 +190,30 @@
 				<label for="Time_Sync" class="translate">Intervall in seconds</label>
 			</div>
 		</div>
+		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.  -->
+
+		<h4 class="translate">IP adresses</h4>
+		<div id="values" style="width: 100%; height: calc(100% - 230px)">
+			<button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
+			<div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
+				<table class="table-values" style="width: 100%;">
+					<thead>
+					<tr>
+						<th data-name="_index"   style="width: 40px" class="translate"></th>
+						<th data-name="Username"     style="width: 15%" class="translate">Username</th>
+						<th data-name="Password" data-type="password" style="width: 15%" class="translate">Password</th>						
+						<th data-name="ip"  data-type="number" style="width: 30%" class="translate">IP Address</th>
+						<th data-name="port" data-type="number" style="width: 10%"class="translate">Port</th>
+						<th data-name="intervall" data-type="number" style="width: 15%" class="translate">Intervall (s)</th>
+						<th data-buttons="delete" style="width: 15%"></th>
+					</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+
+
+
 	</div>
 
 </body>

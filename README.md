@@ -4,7 +4,7 @@
 [![NPM version](http://img.shields.io/npm/v/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
 [![Dependency Status](https://img.shields.io/david/iobroker-community-adapters/iobroker.wlanthermo-nano.svg)](https://david-dm.org/iobroker-community-adapters/iobroker.wlanthermo-nano)
-![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-installed.svg) ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.sourceanalytix.svg)](https://www.npmjs.com/package/
+![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-installed.svg) ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/
 [![Known Vulnerabilities](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano/badge.svg)](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano)
 
 [![NPM](https://nodei.co/npm/iobroker.wlanthermo-nano.png?downloads=true)](https://nodei.co/npm/iobroker.wlanthermo-nano/)
@@ -23,6 +23,8 @@ Please enter IP-adress, username and password in the instance configuration.
 Currenlty 1 device is supported, if you want to monitor a secode device please user en second instance.
 (in future release mutliple devices by 1 adapter will be supported).
 
+# Do not install from github for now, only by ioBroker admin ! (change in progress in repository)
+
 ## To-Do
 
 * [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
@@ -30,6 +32,9 @@ Currenlty 1 device is supported, if you want to monitor a secode device please u
 * [ ] code cleanup
 
 ## Changelog
+
+### 0.1.2  (in progress, not released !)
+* (DutchmanNL) Support multiple devices
 
 ### 0.1.1
 * (DutchmanNL) Code optimalisation
