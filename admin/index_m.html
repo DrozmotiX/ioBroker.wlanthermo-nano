@@ -1,6 +1,14 @@
 <html>
 
 <head>
+	<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+
+	<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+	
+
+
 
 	<!-- Load ioBroker scripts and styles-->
 	<link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
@@ -67,8 +75,47 @@
         }
 	}
 	
+		function getTableValues(settings,isFirst){
+			console.log('Settings : ' + JSON.stringify(settings.devices));
+			var index = 1;
+
+
+			// add loop 
+			loadTable(settings.devices[0],index,settings.devices);
+		}
+
+		function loadTable(obj, index, test_obj){
+			console.log('Loaded obj : ' + JSON.stringify(obj));
+			// console.log('isFirst : ' + JSON.stringify(isFirst));
+
+			console.log('Loaded obj : ' + index);
+			console.log('Loaded obj : ' + obj.Username);
+
+			for (i in test_obj){
+
+				console.log('Loaded object array : ' + test_obj[i]);
+
+
+			}
+
+			var text = '';
+					
+					text += '<td>' + index + '</td>'
+					text += '<td>' + obj.Username + '</td>'
+					text += '<td> <input type="password" class="validate  input-field col s2" value="' + obj.Password + '"></td>'
+					text += '<td>' + obj.ip + '</td>'
+					text += '<td>' + obj.port + '</td>'
+					text += '<td>' + obj.intervall + '</td>'
+					text += '<td>' + '' +
+						'<a id="'+ index + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete group from deConz">delete</i></a>';
+					text += '</select></td>';
+					text = '<tr data-id="' + index+ '">' + text + '</tr>';
+					console.log('Loaded table : ' + text);
+					$('#devices').append(text);
+		}
+
 		function loadHelper(settings, onChange) {
-      // example: select elements with id=key and class=value and insert value
+	  // example: select elements with id=key and class=value and insert value
 			if (!settings) return;
          		$('.value').each(function () {
 					var $key = $(this);
@@ -97,6 +144,7 @@
 
 		// This will be called by the admin adapter when the settings page loads
 		function load(settings, onChange) {	
+			
 			// example: select elements with id=key and class=value and insert value
 			if (!settings) return;
 			socket.emit('getObject', 'system.config', function (err, obj) {
@@ -104,16 +152,17 @@
              loadHelper(settings, onChange);
 		   });
 		   
-		   devices = settings.devices || [];
-			for (var key in settings) {
-				if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
-			}
-			values2table('values', devices, onChange);
+		//    devices = settings.devices || [];
+		// 	for (var key in settings) {
+		// 		if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
+		// 	}
+			// values2table('values', devices, onChange);
 
-
+			getTableValues(settings);
+			// $('#devices').append(settings);
 			onChange(false);
 			// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
-//			if (M) M.updateTextFields();
+			M.updateTextFields();
 		}
 
 		// This will be called by the admin adapter when the user presses the save button
@@ -122,21 +171,33 @@
          var obj = {};
          $('.value').each(function () {
              var $this = $(this);
-             var id = $this.attr('id');
+			 var id = $this.attr('id');
              if ($this.attr('type') === 'checkbox') {
                  obj[id] = $this.prop('checked');
              } else {
                  var value = $this.val();
                  if (id === 'Password') {
                      value = encrypt(secret, value);
-                 }
+				 }
+				 
+				//  if (obj[0].Password){
+
+					// console.log(id + " + " + value);
+					
+					console.log('Array' + JSON.stringify(obj));
+
+				//  }
                  obj[id] = value;
              }
 			});
         // Get edited table
-        obj.devices = table2values('values');
+		// obj.devices = table2values('values');
+		
+		console.log('values : '  + JSON.stringify(obj.devices));
+
         callback(obj);
   }
+
 	</script>
 
 </head>
@@ -154,12 +215,12 @@
 		<!-- For example two columns with settings: -->
 
 		<!--		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.
-		
+		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.  -->
 	
-	<div class="section">
+		<div class="section">
 			<h6 class="translate">ip-adress of WLANThermo</h6>
 		</div>
-		
+		<!--
 		<div class="row">
 			<div class="col s4 input-field">
 				<input type="text" class="value" id="Username" />
@@ -190,13 +251,43 @@
 				<label for="Time_Sync" class="translate">Intervall in seconds</label>
 			</div>
 		</div>
-		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.  -->
+-->
+		<div class="row">
+				<a class="table-button-add waves-effect waves-light btn blue translate"><i class="large left material-icons">add_circle</i>Add Device</a>
+		</div>
+		<div class="col s12">
+			<div class="table-values-div row">
+                <table class="table-values centered">
+                    <thead>
+                    <tr>
+						<th data-name="_index" class="translate"></th>
+                        <th class="translate" data-lang="Name">User</th>
+						<th class="translate s2" >Password</th>
+						<!--
+                        <th class="translate" data-lang="Devices (ID of Device)">IP</th>
+						<th class="translate" data-lang="Lights (ID of Light)">Port</th>
+						-->
+						<th class="translate" >IP</th>
+						<th class="translate" >Port</th>
+						<th class="translate" >Intervall</th>
+                        <th class="translate">Remove</th>
+                    </tr>
+                    </thead>
+					<tbody id="devices"></tbody>
+					
+                </table>
+			</div>
+		</div>
+		
+			
+			
 
-		<h4 class="translate">IP adresses</h4>
-		<div id="values" style="width: 100%; height: calc(100% - 230px)">
+
+		<!-- <div id="values" style="width: 100%; height: calc(100% - 230px)">
 			<button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
 			<div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
 				<table class="table-values" style="width: 100%;">
+					
 					<thead>
 					<tr>
 						<th data-name="_index"   style="width: 40px" class="translate"></th>
@@ -206,11 +297,14 @@
 						<th data-name="port" data-type="number" style="width: 10%"class="translate">Port</th>
 						<th data-name="intervall" data-type="number" style="width: 15%" class="translate">Intervall (s)</th>
 						<th data-buttons="delete" style="width: 15%"></th>
+
 					</tr>
 					</thead>
 				</table>
 			</div>
-		</div>
+		</div> -->
+
+
 
 
 
