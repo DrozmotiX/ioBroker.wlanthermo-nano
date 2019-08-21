@@ -77,41 +77,37 @@
 	
 		function getTableValues(settings,isFirst){
 			console.log('Settings : ' + JSON.stringify(settings.devices));
-			var index = 1;
-
 
 			// add loop 
-			loadTable(settings.devices[0],index,settings.devices);
+			loadTable(settings.devices);
 		}
 
-		function loadTable(obj, index, test_obj){
+		function loadTable(obj){
 			console.log('Loaded obj : ' + JSON.stringify(obj));
-			// console.log('isFirst : ' + JSON.stringify(isFirst));
-
-			console.log('Loaded obj : ' + index);
-			console.log('Loaded obj : ' + obj.Username);
-
-			for (i in test_obj){
-
-				console.log('Loaded object array : ' + test_obj[i]);
-
-
-			}
-
+			var  index = 1;
 			var text = '';
-					
+
+			for (i in obj){
+
+			console.log('Loaded object array value : ' + obj[i]);
 					text += '<td>' + index + '</td>'
-					text += '<td>' + obj.Username + '</td>'
-					text += '<td> <input type="password" class="validate  input-field col s2" value="' + obj.Password + '"></td>'
-					text += '<td>' + obj.ip + '</td>'
-					text += '<td>' + obj.port + '</td>'
-					text += '<td>' + obj.intervall + '</td>'
+					text += '<td> <input type="text" class="validate input-field" value="' + obj[i].Username + '"></td>'
+					text += '<td> <input type="password" class="validate  input-field" value="' + obj[i].Password + '"></td>'
+					text += '<td> <input type="number" value="' + obj[i].ip + '"></td>'
+					text += '<td> <input type="number" value="' + obj[i].port + '"></td>'
+					text += '<td> <input type="number" min="5" value="' + obj[i].intervall + '"></td>'
 					text += '<td>' + '' +
 						'<a id="'+ index + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete group from deConz">delete</i></a>';
 					text += '</select></td>';
 					text = '<tr data-id="' + index+ '">' + text + '</tr>';
 					console.log('Loaded table : ' + text);
-					$('#devices').append(text);
+					// $('#devices').append(text);
+					index = (index + 1);
+
+			}
+			$('#devices').append(text);
+			console.log('Complete device list : ' + JSON.stringify(text));
+
 		}
 
 		function loadHelper(settings, onChange) {
@@ -216,11 +212,11 @@
 
 		<!--		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.
 		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.  -->
-	
+	<!--
 		<div class="section">
 			<h6 class="translate">ip-adress of WLANThermo</h6>
 		</div>
-		<!--
+		
 		<div class="row">
 			<div class="col s4 input-field">
 				<input type="text" class="value" id="Username" />
@@ -260,9 +256,9 @@
                 <table class="table-values centered">
                     <thead>
                     <tr>
-						<th data-name="_index" class="translate"></th>
-                        <th class="translate" data-lang="Name">User</th>
-						<th class="translate s2" >Password</th>
+						<th class="translate" > </th>
+                        <th class="translate" >Username</th>
+						<th class="translate" >Password</th>
 						<!--
                         <th class="translate" data-lang="Devices (ID of Device)">IP</th>
 						<th class="translate" data-lang="Lights (ID of Light)">Port</th>
