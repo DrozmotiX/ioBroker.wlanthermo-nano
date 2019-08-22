@@ -27,6 +27,8 @@
 
 	<script type="text/javascript">
 
+		let device_array;
+
 		// Create secrect for encrypted password storage
 		var secret;
 		function encrypt(key, value) {
@@ -91,11 +93,11 @@
 
 			console.log('Loaded object array value : ' + obj[i]);
 					text += '<td>' + index + '</td>'
-					text += '<td> <input type="text" class="validate input-field" value="' + obj[i].Username + '"></td>'
+					text += '<td> <input type="text" class="validate input-field center-align" value="' + obj[i].Username + '"></td>'
 					text += '<td> <input type="password" class="validate  input-field" value="' + obj[i].Password + '"></td>'
-					text += '<td> <input type="number" value="' + obj[i].ip + '"></td>'
-					text += '<td> <input type="number" value="' + obj[i].port + '"></td>'
-					text += '<td> <input type="number" min="5" value="' + obj[i].intervall + '"></td>'
+					text += '<td> <input type="number" class="center-align" value="' + obj[i].ip + '"></td>'
+					text += '<td> <input type="number" class="center-align" value="' + obj[i].port + '"></td>'
+					text += '<td> <input type="number" class="center-align" min="5" value="' + obj[i].intervall + '"></td>'
 					text += '<td>' + '' +
 						'<a id="'+ index + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete group from deConz">delete</i></a>';
 					text += '</select></td>';
@@ -103,36 +105,65 @@
 					console.log('Loaded table : ' + text);
 					// $('#devices').append(text);
 					index = (index + 1);
-
 			}
 			$('#devices').append(text);
 			console.log('Complete device list : ' + JSON.stringify(text));
 
 		}
 
+		function add_row(){
+
+
+
+			console.log.info('Length in function : ' + length);
+			const array = device_array.length;
+			// const array = 2;
+			var index = (array + 1);
+			var text = '';
+
+			console.log('Loaded object add row value : ');
+					text += '<td>' + index + '</td>'
+					text += '<td> <input type="text" class="validate input-field center-align" value=""></td>'
+					text += '<td> <input type="password" class="validate  input-field" value=""></td>'
+					text += '<td> <input type="number" class="center-align" value=""></td>'
+					text += '<td> <input type="number" class="center-align" value=""></td>'
+					text += '<td> <input type="number" class="center-align" min="5" value=""></td>'
+					text += '<td>' + '' +
+						'<a id="'+ index + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete group from deConz">delete</i></a>';
+					text += '</select></td>';
+					text = '<tr data-id="' + index+ '">' + text + '</tr>';
+					console.log('Loaded table add row : ' + text);
+					// $('#devices').append(text);
+					index = (index + 1);
+			$('#devices').append(text);
+			console.log('Complete device list : ' + JSON.stringify(text));
+			
+		}
+
 		function loadHelper(settings, onChange) {
 	  // example: select elements with id=key and class=value and insert value
-			if (!settings) return;
-         		$('.value').each(function () {
-					var $key = $(this);
-					var id = $key.attr('id');
-					if (id === 'Password') {
-						settings[id] = decrypt(secret, settings[id]);
-					}
-					if ($key.attr('type') === 'checkbox') {
-					// do not call onChange direct, because onChange could expect some arguments
-						$key.prop('checked', settings[id]).change(function() {
-						onChange();
-					});
-					}	 else {
-					// do not call onChange direct, because onChange could expect some arguments
-						$key.val(settings[id]).change(function() {
-						onChange();
-					}).keyup(function() {
-						onChange();
-					});
-					}
-				});
+			// if (!settings) return;
+         		// $('.value').each(function () {
+				// 	var $key = $(this);
+				// 	var id = $key.attr('id');
+					
+				// 	if (id === 'Password') {
+				// 		settings[id] = decrypt(secret, settings[id]);
+				// 	}
+				// 	if ($key.attr('type') === 'checkbox') {
+				// 	// do not call onChange direct, because onChange could expect some arguments
+				// 		$key.prop('checked', settings[id]).change(function() {
+				// 		onChange();
+				// 	});
+				// 	}	 else {
+				// 	// do not call onChange direct, because onChange could expect some arguments
+				// 		$key.val(settings[id]).change(function() {
+				// 		onChange();
+				// 	}).keyup(function() {
+				// 		onChange();
+				// 	});
+				// 	}
+				// });
    			onChange(false);
    			// function Materialize.updateTextFields(); to reinitialize all the Materialize labels on the page if you are dynamically adding inputs.
         	M.updateTextFields();
@@ -140,9 +171,31 @@
 
 		// This will be called by the admin adapter when the settings page loads
 		function load(settings, onChange) {	
-			
+			device_array = settings.devices;
+			console.log(device_array.length);
+			console.log('Global device array + ' + JSON.stringify(settings))	
+			getTableValues(settings);
 			// example: select elements with id=key and class=value and insert value
 			if (!settings) return;
+			$('.input-field').each(function () {
+				var $key = $(this);
+				var id = $key.attr('id');
+				if ($key.attr('type') === 'checkbox') {
+					// do not call onChange direct, because onChange could expect some arguments
+					$key.prop('checked', settings[id]).change(function() {
+						onChange();
+					});
+				} else {
+					// do not call onChange direct, because onChange could expect some arguments
+					$key.val(settings[id]).change(function() {
+						onChange();
+					}).keyup(function() {
+						onChange();
+					});
+				}
+			});
+			
+
 			socket.emit('getObject', 'system.config', function (err, obj) {
              secret = (obj.native ? obj.native.secret : '') || 'Zgfr56gFe87jJOM';
              loadHelper(settings, onChange);
@@ -153,8 +206,13 @@
 		// 		if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
 		// 	}
 			// values2table('values', devices, onChange);
-
-			getTableValues(settings);
+			// $('input').change().keyup(function () {
+            // $(this).trigger('change');
+			//  });
+			 
+			//  $('#add-device').click(function(){
+			// 	 add_row();
+			//  });
 			// $('#devices').append(settings);
 			onChange(false);
 			// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
@@ -202,108 +260,36 @@
 
 	<div class="m adapter-container">
 
-		<!-- Put your content here -->
-		<table><tr>
-			<td><img src="wlanthermo-nano.png" width="64px" height="64px"></td>
-			<td style="padding-top: 20px;padding-left: 10px"><h3 class="translate">WLANThermo adapter settings</h3></td>
-		</tr></table>
-
-		<!-- For example two columns with settings: -->
-
-		<!--		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.
-		@JeyCee dieser teil functioniert, moechte aber von einen eintrag nach tabellen vorm also x geraete unterstuetzen.  -->
-	<!--
-		<div class="section">
-			<h6 class="translate">ip-adress of WLANThermo</h6>
-		</div>
-		
 		<div class="row">
-			<div class="col s4 input-field">
-				<input type="text" class="value" id="Username" />
-				<label for="Username" class="translate">Username</label>
-			</div>
-			<div class="col s3 input-field">
-				<input type="password" class="value" id="Password" />
-				<label for="Password" class="translate">Password</label>
-			</div>		 
-		</div>
-
-		<div class="row">
-			<div class="col s4 input-field">
-				<input type="text" class="value" id="IP" />
-				<label for="IP" class="translate">IP</label>
-			</div>
-			<div class="input-field col s2">
-				<input type="number" id="receive_port" class="value" min="0" max="65565"/>
-				<label for="port" class="translate">Adapter Port</label>
+			<div class="input-field col s6 m4 l6">
+				<img src="wlanthermo-nano.png" class="logo">
 			</div>
 		</div>
-		<div class="section">
-			<h6 class="translate">Time Syncronisation intervall</h6>
-		 </div>		
 		<div class="row">
-			<div class="input-field col s2">
-				<input type="number" id="Time_Sync" class="value" min="0" max="12000"/>
-				<label for="Time_Sync" class="translate">Intervall in seconds</label>
-			</div>
+				<a id="add-device" class="table-button-add waves-effect waves-light btn blue translate"><i class="large left material-icons">add_circle</i>Add Device</a>
 		</div>
--->
-		<div class="row">
-				<a class="table-button-add waves-effect waves-light btn blue translate"><i class="large left material-icons">add_circle</i>Add Device</a>
-		</div>
-		<div class="col s12">
-			<div class="table-values-div row">
+		<div class="col s10 m10 l10 xl10 row">
+			<div class="table-values-div">
                 <table class="table-values centered">
                     <thead>
-                    <tr>
-						<th class="translate" > </th>
-                        <th class="translate" >Username</th>
-						<th class="translate" >Password</th>
-						<!--
-                        <th class="translate" data-lang="Devices (ID of Device)">IP</th>
-						<th class="translate" data-lang="Lights (ID of Light)">Port</th>
-						-->
-						<th class="translate" >IP</th>
-						<th class="translate" >Port</th>
-						<th class="translate" >Intervall</th>
-                        <th class="translate">Remove</th>
-                    </tr>
+						<tr>
+							<th class="translate" > </th>
+							<th class="translate" >Username</th>
+							<th class="translate" >Password</th>
+							<!--
+							<th class="translate" data-lang="Devices (ID of Device)">IP</th>
+							<th class="translate" data-lang="Lights (ID of Light)">Port</th>
+							-->
+							<th class="translate" >IP</th>
+							<th class="translate" >Port</th>
+							<th class="translate" >Intervall</th>
+							<th class="translate">Remove</th>
+						</tr>
                     </thead>
-					<tbody id="devices"></tbody>
-					
+					<tbody id="devices"></tbody>	
                 </table>
 			</div>
 		</div>
-		
-			
-			
-
-
-		<!-- <div id="values" style="width: 100%; height: calc(100% - 230px)">
-			<button class="table-button-add" style="margin-left: 10px; width: 1.5em; height: 1.5em"></button>
-			<div style="width: 100%; height: calc(100% - 30px); overflow: auto;">
-				<table class="table-values" style="width: 100%;">
-					
-					<thead>
-					<tr>
-						<th data-name="_index"   style="width: 40px" class="translate"></th>
-						<th data-name="Username"     style="width: 15%" class="translate">Username</th>
-						<th data-name="Password" data-type="password" style="width: 15%" class="translate">Password</th>						
-						<th data-name="ip"  data-type="number" style="width: 30%" class="translate">IP Address</th>
-						<th data-name="port" data-type="number" style="width: 10%"class="translate">Port</th>
-						<th data-name="intervall" data-type="number" style="width: 15%" class="translate">Intervall (s)</th>
-						<th data-buttons="delete" style="width: 15%"></th>
-
-					</tr>
-					</thead>
-				</table>
-			</div>
-		</div> -->
-
-
-
-
-
 	</div>
 
 </body>
