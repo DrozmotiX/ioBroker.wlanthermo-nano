@@ -1,19 +1,55 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.1.1",
+		"version": "0.1.2",
 		"news": {
+			"0.1.2": {
+				"en": "Support multiple devices",
+				"de": "Unterstützt mehrere Geräte",
+				"ru": "Поддержка нескольких устройств",
+				"pt": "Suporta vários dispositivos",
+				"nl": "Ondersteuning van meerdere apparaten",
+				"fr": "Soutenir plusieurs appareils",
+				"it": "Supporta più dispositivi",
+				"es": "Soporta múltiples dispositivos",
+				"pl": "Obsługuje wiele urządzeń",
+				"zh-cn": "支持多种设备"
+			},
+			"0.1.1": {
+				"en": "Code optimalisation",
+				"de": "Code-Optimierung",
+				"ru": "Оптимизация кода",
+				"pt": "Otimização de código",
+				"nl": "Optimalisatie van code",
+				"fr": "Optimisation du code",
+				"it": "Ottimizzazione del codice",
+				"es": "Optimización de código",
+				"pl": "Optymalizacja kodu",
+				"zh-cn": "代码优化"
+			},
 			"0.1.0": {
-				"en": "initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Начальная версия",
-				"pt": "lançamento inicial",
-				"nl": "Eerste uitgave",
-				"fr": "Première version",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"zh-cn": "首次出版"
+				"en": "Optimise state settings with dropdown menu,  Pidmaster integration",
+				"de": "Optimieren Sie die Statuseinstellungen mit dem Dropdown-Menü Pidmaster-Integration",
+				"ru": "Оптимизация настроек состояния с помощью выпадающего меню, интеграция с Pidmaster",
+				"pt": "Otimize as configurações de estado com o menu suspenso, integração Pidmaster",
+				"nl": "Optimaliseer de statusinstellingen met het vervolgkeuzemenu, Pidmaster-integratie",
+				"fr": "Optimiser les paramètres d'état avec le menu déroulant, intégration Pidmaster",
+				"it": "Ottimizza le impostazioni dello stato con il menu a discesa, l'integrazione di Pidmaster",
+				"es": "Optimizar la configuración de estado con menú desplegable, integración Pidmaster",
+				"pl": "Zoptymalizuj ustawienia stanu za pomocą menu rozwijanego, integracji Pidmaster",
+				"zh-cn": "使用下拉菜单，Pidmaster集成优化状态设置"
+			},
+			"0.0.2": {
+					"en": "initial release",
+					"de": "Erstveröffentlichung",
+					"ru": "Первый выпуск",
+					"pt": "lançamento inicial",
+					"nl": "Eerste uitgave",
+					"fr": "Première version",
+					"it": "Versione iniziale",
+					"es": "Versión inicial",
+					"pl": "Pierwsze wydanie",
+					"zh-cn": "初始发行"
 			}
 		},
 		"title": "WLANThermo-Nano",
@@ -44,6 +80,9 @@
 		"authors": [
 			"DutchmanNL <rdrozda86@gmail.com>"
 		],
+		"contributors": [
+			"Jey-Cee"
+		  ],
 		"keywords": [
 			"WLANThermo",
 			"barbecue",
@@ -68,10 +107,7 @@
 		]
 	},
 	"native": {
-		"Username": "admin",
-		"Password": "admin",
-		"IP": "192.168.1.50",
-		"receive_port": 80,
+		"devices": [],
 		"Time_Sync" : 10
 	},
 	"objects": [],

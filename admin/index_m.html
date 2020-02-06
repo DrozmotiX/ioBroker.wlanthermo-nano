@@ -1,7 +1,6 @@
 <html>
 
 <head>
-
 	<!-- Load ioBroker scripts and styles-->
 	<link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
 	<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
@@ -19,84 +18,164 @@
 
 	<script type="text/javascript">
 
+		let device_array;
+		let _onChange;
+
 		// Create secrect for encrypted password storage
-		var secret;
 		function encrypt(key, value) {
-			var result = '';
-			for(var i = 0; i < value.length; ++i) {
+			let result = '';
+			for(let i = 0; i < value.length; ++i) {
 				result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
 			}
 			return result;
 		}
 		function decrypt(key, value) {
-			var result = '';
-			for(var i = 0; i < value.length; ++i) {
+			let result = '';
+			for(let i = 0; i < value.length; ++i) {
 				result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
 			}
 			return result;
 		}
 
-		function loadHelper(settings, onChange) {
-      // example: select elements with id=key and class=value and insert value
-			if (!settings) return;
-         		$('.value').each(function () {
-					var $key = $(this);
-					var id = $key.attr('id');
-					if (id === 'Password') {
-						settings[id] = decrypt(secret, settings[id]);
-					}
-					if ($key.attr('type') === 'checkbox') {
-					// do not call onChange direct, because onChange could expect some arguments
-						$key.prop('checked', settings[id]).change(function() {
-						onChange();
-					});
-					}	 else {
-					// do not call onChange direct, because onChange could expect some arguments
-						$key.val(settings[id]).change(function() {
-						onChange();
-					}).keyup(function() {
-						onChange();
-					});
-					}
-				});
-   			onChange(false);
-   			// function Materialize.updateTextFields(); to reinitialize all the Materialize labels on the page if you are dynamically adding inputs.
-        	M.updateTextFields();
+		function getTableValues(settings){
+			// add loop 
+			loadTable(settings.devices, settings);
 		}
 
+		function loadTable(obj){
+			let  index = 1;
+			let text = '';
+
+            for(i in obj) {
+                let m = obj[i].Password;
+                console.log(m);
+                    let decrypted = decrypt(secret, m);
+
+                    text += '<tr id="' + index + '"><td><span id="' + index + '-index">' + index + '</span></td>'
+                    text += '<td> <input id="' + index + '-username" type="text" class="validate center-align input-field" value="' + obj[i].Username + '"></td>'
+                    text += '<td> <input id="' + index + '-password" type="password" class="validate input-field" value="' + decrypted + '"></td>'
+                    text += '<td> <input id="' + index + '-ip" type="text" class="center-align input-field" value="' + obj[i].ip + '"></td>'
+                    text += '<td> <input id="' + index + '-port" type="number" class="center-align input-field" value="' + obj[i].port + '"></td>'
+                    text += '<td>' + '' +
+                        '<a id="' + index + '-delete" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete device">delete</i></a>';
+                    text += '</select></td></tr>';
+
+                    index = (index + 1);
+                }
+                $('#devices').append(text);
+
+                $('input, .delete-device').each(function () {
+                    let $key = $(this);
+
+                    $key.on('click', function () {
+                        _onChange();
+                    }).keyup(function () {
+                        _onChange();
+                    });
+
+                    $key.change(function () {
+                        _onChange();
+                    }).keyup(function () {
+                        _onChange();
+                    });
+                });
+		}
+
+		function add_row(){
+			let index = $('tr').length;
+			//TODO: add overwrite protection for existing index number if a previous device was removed from the list
+
+			let text = '';
+
+					text += '<tr id="' + index+ '" class="delete-device"><td><span id="'+ index + '-index">' + index + '</span></td>'
+					text += '<td> <input id="'+ index + '-username" type="text" class="validate input-field center-align" value="<Enter Name>"></td>'
+					text += '<td> <input id="'+ index + '-password" type="password"   class="validate  input-field" value=""></td>'
+					text += '<td> <input id="'+ index + '-ip" type="text" class="center-align input-field" value="192.168.xxx.xxx"></td>'
+					text += '<td> <input id="'+ index + '-port" type="number" class="center-align input-field" value="80"></td>'
+					text += '<td>' + '' +
+						'<a id="'+ index + '-delete" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete device">delete</i></a>';
+					text += '</select></td></tr>';
+
+			$('#devices').append(text);
+
+
+            $('input').each(function () {
+                let $key = $(this);
+
+                $key.on('click', function(){
+                    _onChange();
+                }).keyup(function() {
+                    _onChange();
+                });
+
+                $key.change(function() {
+                    _onChange();
+                }).keyup(function() {
+                    _onChange();
+                });
+            });
+
+            M.updateTextFields();
+		}
+
+
 		// This will be called by the admin adapter when the settings page loads
-		function load(settings, onChange) {
-			// example: select elements with id=key and class=value and insert value
+		function load(settings, onChange) {	
+			device_array = settings.devices;
+			_onChange = onChange;
+
 			if (!settings) return;
+
 			socket.emit('getObject', 'system.config', function (err, obj) {
              secret = (obj.native ? obj.native.secret : '') || 'Zgfr56gFe87jJOM';
-             loadHelper(settings, onChange);
-   		});
+             getTableValues(settings);
+		   });
+
+
+			 
+			$('#add-device').click(function(){
+			add_row();
+			});
+
+            $(document).on('click', '[id$=-delete]', function(obj){
+               let id = obj.currentTarget.id;
+               id = id.replace('-delete', '');
+               $('#' + id).remove();
+               onChange();
+           });
+
 			onChange(false);
 			// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
-//			if (M) M.updateTextFields();
+			M.updateTextFields();
 		}
 
 		// This will be called by the admin adapter when the user presses the save button
 		function save(callback) {
-         // example: select elements with class=value and build settings object
-         var obj = {};
-         $('.value').each(function () {
-             var $this = $(this);
-             var id = $this.attr('id');
-             if ($this.attr('type') === 'checkbox') {
-                 obj[id] = $this.prop('checked');
-             } else {
-                 var value = $this.val();
-                 if (id === 'Password') {
-                     value = encrypt(secret, value);
-                 }
-                 obj[id] = value;
-             }
-         });
-  
-   callback(obj);
-  }
+			let obj = {};
+            let i = 0;
+            $('tbody > tr').each(function(){
+                i = i+1;
+                let username = $('#' + i + '-username').val();
+                let password = $('#' + i + '-password').val();
+                let ip = $('#' + i + '-ip').val();
+                let port = $('#' + i + '-port').val();
+
+                let encrypted = encrypt(secret, password);
+
+                if(!obj.devices){
+                    obj.devices = {1:{Username: username, Password: encrypted, ip: ip, port: port}};
+                }else{
+                    obj.devices[i] = {Username: username, Password: encrypted, ip: ip, port: port};
+                }
+
+                console.log(JSON.stringify(obj));
+            });
+            console.log('index: ' + i);
+
+
+        callback(obj);
+ 	 }
+
 	</script>
 
 </head>
@@ -105,43 +184,29 @@
 
 	<div class="m adapter-container">
 
-		<!-- Put your content here -->
-		<h1 class="translate">WLANThermo adapter settings</h1>
-
-		<!-- For example two columns with settings: -->
-		
-		<div class="section">
-			<h6 class="translate">ip-adress of WLANThermo</h6>
-		</div>
-		
 		<div class="row">
-			<div class="col s4 input-field">
-				<input type="text" class="value" id="Username" />
-				<label for="Username" class="translate">Username</label>
-			</div>
-			<div class="col s3 input-field">
-				<input type="password" class="value" id="Password" />
-				<label for="Password" class="translate">Password</label>
-			</div>		 
-		</div>
-
-		<div class="row">
-			<div class="col s4 input-field">
-				<input type="text" class="value" id="IP" />
-				<label for="IP" class="translate">IP</label>
-			</div>
-			<div class="input-field col s2">
-				<input type="number" id="receive_port" class="value" min="0" max="65565"/>
-				<label for="port" class="translate">Adapter Port</label>
+			<div class="input-field col s6 m4 l6">
+				<img src="wlanthermo-nano.png" class="logo">
 			</div>
 		</div>
-		<div class="section">
-			<h6 class="translate">Time Syncronisation intervall</h6>
-		 </div>		
 		<div class="row">
-			<div class="input-field col s2">
-				<input type="number" id="Time_Sync" class="value" min="0" max="12000"/>
-				<label for="Time_Sync" class="translate">Intervall in seconds</label>
+				<a id="add-device" class="table-button-add waves-effect waves-light btn blue translate"><i class="large left material-icons">add_circle</i>Add Device</a>
+		</div>
+		<div class="col s10 m10 l10 xl10 row">
+			<div class="table-values-div">
+                <table class="table-values centered">
+                    <thead>
+						<tr>
+							<th class="translate" > </th>
+							<th class="translate" >Username</th>
+							<th class="translate" >Password</th>
+							<th class="translate" >IP</th>
+							<th class="translate" >Port</th>
+							<th class="translate">Remove</th>
+						</tr>
+                    </thead>
+					<tbody id="devices"></tbody>	
+                </table>
 			</div>
 		</div>
 	</div>
