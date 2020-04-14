@@ -100,6 +100,11 @@
 		"type": "household",
 		"compact": true,
 		"materialize": true,
+		"plugins": {
+			"sentry": {
+				"dsn": "https://a1dee206514f444d843940f8b443d47d@sentry.iobroker.net/26"
+			}
+		},
 		"dependencies": [
 			{
 				"js-controller": ">=1.4.2"
