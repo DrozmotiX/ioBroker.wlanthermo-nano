@@ -36,7 +36,6 @@ class WlanthermoNano extends utils.Adapter {
 	async onReady() {
 
 		this.log.info('WLANThermo startet, loading devices');
-		setTimeout(sentryTest, 10000);
 		// Nasty workarround only test
 		initialise = true;
 
