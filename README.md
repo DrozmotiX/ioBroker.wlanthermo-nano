@@ -6,6 +6,7 @@
 [![Dependency Status](https://img.shields.io/david/iobroker-community-adapters/iobroker.wlanthermo-nano.svg)](https://david-dm.org/iobroker-community-adapters/iobroker.wlanthermo-nano)
 ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-installed.svg) ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-stable.svg)
 [![Known Vulnerabilities](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano/badge.svg)](https://snyk.io/test/github/iobroker-community-adapters/ioBroker.wlanthermo-nano)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiobroker-community-adapters%2FioBroker.wlanthermo-nano.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiobroker-community-adapters%2FioBroker.wlanthermo-nano?ref=badge_shield)
 
 [![NPM](https://nodei.co/npm/iobroker.wlanthermo-nano.png?downloads=true)](https://nodei.co/npm/iobroker.wlanthermo-nano/)
 
@@ -102,3 +103,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiobroker-community-adapters%2FioBroker.wlanthermo-nano.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiobroker-community-adapters%2FioBroker.wlanthermo-nano?ref=badge_large)
