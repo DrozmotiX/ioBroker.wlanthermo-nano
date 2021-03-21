@@ -9,8 +9,8 @@
 
 // Load your modules here, e.g.:
 const utils = require('@iobroker/adapter-core');
-const state_attr = require(__dirname + '/lib/state_attr.js');
-const axios = require('axios');
+const stateAttr = require(__dirname + '/lib/stateAttr.js');
+const { default: axios } = require('axios');
 
 let data,  unit_device, polling, initialise, user = {}, pass = {}; // , info, networklist; ==> these options from APi are currenlty not used
 
