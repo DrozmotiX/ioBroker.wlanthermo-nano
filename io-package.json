@@ -93,8 +93,8 @@
 		"main": "main.js",
 		"icon": "wlanthermo-nano.png",
 		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.wlanthermo-nano/master/admin/wlanthermo-nano.png",
-		"readme": "https://github.com/iobroker-community-adapters/ioBroker.wlanthermo-nano/blob/master/README.md",
+		"extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/master/admin/wlanthermo-nano.png",
+		"readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/master/README.md",
 		"loglevel": "info",
 		"mode": "daemon",
 		"type": "household",
@@ -112,9 +112,16 @@
 		]
 	},
 	"native": {
-		"devices": [],
-		"Time_Sync" : 10
-	},
+		"devices": [
+			{
+			  "username": "admin",
+			  "password": "admin",
+			  "ip": "192.168.xxx.xxx",
+			  "port": "80"
+			}
+		  ],
+		  "intervallTime": 10
+		},
 	"objects": [],
 	"instanceObjects": []
 }

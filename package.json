@@ -6,7 +6,7 @@
     "name": "DutchmanNL",
     "email": "rdrozda86@gmail.com"
   },
-  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.wlanthermo-nano",
+  "homepage": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano",
   "license": "MIT",
   "keywords": [
     "WLANThermo",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.wlanthermo-nano"
+    "url": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^1.0.3",
