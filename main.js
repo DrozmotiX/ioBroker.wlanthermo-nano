@@ -49,7 +49,7 @@ class WlanthermoNano extends utils.Adapter {
 
 		const devices = this.config.devices;
 		// Get timer settings from adaptre configuration
-		const intervall_time = this.config.Time_Sync * 1000;
+		const intervall_time = this.config.intervallTime * 1000;
 
 		for (const i in devices){
 			
@@ -136,7 +136,7 @@ class WlanthermoNano extends utils.Adapter {
 
 		} catch (e) {
 
-			this.log.debug('Unable to connect to device ' + index + ' , please check IP / port / username and password !' + e);
+			this.log.error('Unable to connect to device ' + index + ' , please check IP / port / username and password !' + e);
 
 		}
 	}
@@ -155,7 +155,7 @@ class WlanthermoNano extends utils.Adapter {
 	}	
 
 	async create_states(settings){
-		const expire_time  = (this.config.Time_Sync * 4);
+		const expire_time  = (this.config.intervallTime * 4);
 
 		// Read all info related settings and write to states
 		this.log.debug('State creation for : ' + JSON.stringify(settings));
@@ -258,9 +258,9 @@ class WlanthermoNano extends utils.Adapter {
 								type: 'state',
 								common: {
 									name: y,
-									role: state_attr[y].role,
-									read: state_attr[y].read,
-									write: state_attr[y].write,
+									role: stateAttr[y].role,
+									read: stateAttr[y].read,
+									write: stateAttr[y].write,
 									'states': {
 										'0': 'Maverick',
 										'1': 'Fantast-Neu',
@@ -290,9 +290,9 @@ class WlanthermoNano extends utils.Adapter {
 								type: 'state',
 								common: {
 									name: y,
-									role: state_attr[y].role,
-									read: state_attr[y].read,
-									write: state_attr[y].write,
+									role: stateAttr[y].role,
+									read: stateAttr[y].read,
+									write: stateAttr[y].write,
 									'states': {
 										'0': 'Disabled',
 										'1': 'Push-Only',
@@ -315,9 +315,9 @@ class WlanthermoNano extends utils.Adapter {
 								type: 'state',
 								common: {
 									name: y,
-									role: state_attr[y].role,
-									read: state_attr[y].read,
-									write: state_attr[y].write,
+									role: stateAttr[y].role,
+									read: stateAttr[y].read,
+									write: stateAttr[y].write,
 									'states': {
 										'0': 'Disabled',
 										'1': 'Push-Only',
@@ -372,10 +372,10 @@ class WlanthermoNano extends utils.Adapter {
 							type: 'state',
 							common: {
 								name: 'modus',
-								type: state_attr[y].type,
-								role: state_attr[y].role,
-								read: state_attr[y].read,
-								write: state_attr[y].write,
+								type: stateAttr[y].type,
+								role: stateAttr[y].role,
+								read: stateAttr[y].read,
+								write: stateAttr[y].write,
 								'states': {
 									'off': 'off',
 									'manual': 'manual',
@@ -387,7 +387,7 @@ class WlanthermoNano extends utils.Adapter {
 						});
 
 						// Subscribe on state  if writeable
-						if (state_attr[y].write === true){
+						if (stateAttr[y].write === true){
 							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.modus');
 						}
 
@@ -402,10 +402,10 @@ class WlanthermoNano extends utils.Adapter {
 							type: 'state',
 							common: {
 								name: y,
-								type: state_attr[y].type,
-								role: state_attr[y].role,
-								read: state_attr[y].read,
-								write: state_attr[y].write,
+								type: stateAttr[y].type,
+								role: stateAttr[y].role,
+								read: stateAttr[y].read,
+								write: stateAttr[y].write,
 								'states': {
 									'0': 'SSR SousVide"',
 									'1': 'TITAN 50x50',
@@ -417,7 +417,7 @@ class WlanthermoNano extends utils.Adapter {
 						});
 
 						// Subscribe on state  if writeable
-						if (state_attr[y].write === true){
+						if (stateAttr[y].write === true){
 							this.subscribeStates(settings.device['serial'] + '.Pitmaster' + '.Pitmaster_' + (1 + parseInt(i)) + '.' + y);
 						}
 
@@ -452,14 +452,14 @@ class WlanthermoNano extends utils.Adapter {
 		let set_unit;
 		let set_name;
 
-		if (state_attr[name].name === undefined){
+		if (stateAttr[name].name === undefined){
 			set_name = name;
 			this.log.debug('No name defined, using from APi');
 		} else {
-			set_name = state_attr[name].name;
+			set_name = stateAttr[name].name;
 			this.log.debug('Name defined, take  value from library');
 		}
-		if (state_attr[name].unit === undefined){
+		if (stateAttr[name].unit === undefined){
 			set_unit = '';
 			this.log.debug('No unit defined, set to zero');
 		} else {
@@ -470,11 +470,11 @@ class WlanthermoNano extends utils.Adapter {
 		// test attributes  from array
 		const attr_array = {
 			name: set_name,
-			type: state_attr[name].type,
-			role: state_attr[name].role,
+			type: stateAttr[name].type,
+			role: stateAttr[name].role,
 			unit: set_unit,
-			read: state_attr[name].read,
-			write: state_attr[name].write,
+			read: stateAttr[name].read,
+			write: stateAttr[name].write,
 		};
 
 		// this.log.debug(settings.device[name]);
@@ -485,7 +485,7 @@ class WlanthermoNano extends utils.Adapter {
 			native: {},
 		});
 
-		if (state_attr[name].write === true){
+		if (stateAttr[name].write === true){
 			this.subscribeStates(state_root + name);
 		}
 
