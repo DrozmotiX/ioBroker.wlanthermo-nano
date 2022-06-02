@@ -39,7 +39,7 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
-### 0.2.0-alpha.0 - Adapter rebuild to TypeScript
+### 0.2.0-alpha.3 (2022-06-02) - Adapter rebuild to TypeScript
 * (DutchmanNL) Support multiple devices
 * (DutchmanNL) Adapter rebuild to TypeScript
 * (DutchmanNL) Test & Release workflow updated
@@ -50,7 +50,7 @@ If you like my work, please feel free to provide a personal donation
 * (DutchmanNL) Support multiple devices
 
 ### 0.1.1
-* (DutchmanNL) Code optimalisation
+* (DutchmanNL) Code optimisation
 * (DutchmanNL) Implement state_attr.js to handle state options outside of source code
 * (DutchmanNL) Optimised state creation in 1 function
 * (DutchmanNL) Small cleanups

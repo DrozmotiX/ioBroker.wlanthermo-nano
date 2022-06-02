@@ -1,6 +1,6 @@
 {
   "name": "iobroker.wlanthermo-nano",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.3",
   "description": "WLANThermo Nano, the digital advantage for your barbecue sport",
   "author": {
     "name": "DutchmanNL",
@@ -82,7 +82,7 @@
     "test:unit": "mocha test/unit --exit",
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:ts && npm run test:package",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit --jsx react",
     "coverage": "nyc npm run test:ts",
     "lint": "eslint --ext .ts,.tsx src/ admin/src/",
     "translate": "translate-adapter",
