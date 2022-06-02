@@ -1,5 +1,11 @@
 {
-	"wlanthermo-nano adapter settings": "Ustawienia adaptera dla wlanthermo-nano",
-	"option1": "opcja 1",
-	"option2": "Opcja 2"
+    "wlanthermo-nano adapter settings": "Ustawienia adaptera dla wlanthermo-nano",
+    "option1": "opcja 1",
+    "option2": "Opcja 2",
+    "WLANThermo-Nano adapter settings": "Ustawienia adaptera dla WLANThermo-Nano",
+    "Interval in seconds": "Interwał w sekundach",
+    "IP-Address": "Adres IP",
+    "Password": "Hasło",
+    "Please provide IP-Address and logon credentials of WLANThermo-Nano device": "Podaj adres IP i dane logowania do urządzenia WLANThermo-Nano",
+    "Username": "Nazwa użytkownika"
 }

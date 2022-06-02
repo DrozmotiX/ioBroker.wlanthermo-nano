@@ -39,9 +39,12 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
-### __WORK IN PROGRESS__ - Adapter rebuild to TypeScript
+### 0.2.0-alpha.0 - Adapter rebuild to TypeScript
+* (DutchmanNL) Support multiple devices
 * (DutchmanNL) Adapter rebuild to TypeScript
 * (DutchmanNL) Test & Release workflow updated
+* (DutchmanNL) Added state for connection status
+* (DutchmanNL) Ensure  support of all  WLANThermo-Nano Devices
 
 ### 0.1.2
 * (DutchmanNL) Support multiple devices

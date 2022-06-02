@@ -5,7 +5,7 @@
     "_basicSettings": {
       "newLine": true,
       "type": "header",
-      "text": "Please provide your credentials",
+      "text": "Please provide IP-Address and logon credentials of WLANThermo-Nano device",
       "sm": 12,
       "size": 8
     },
