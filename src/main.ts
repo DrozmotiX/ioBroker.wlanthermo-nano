@@ -1,0 +1,520 @@
+/*
+ * Created with @iobroker/create-adapter v2.1.1
+ */
+
+// The adapter-core module gives you access to the core ioBroker functions
+// you need to create an adapter
+import * as utils from '@iobroker/adapter-core';
+
+// Load your modules here, e.g.:
+// import * as fs from "fs";
+import axios from 'axios'; // Load Axios module to allow handle http get & post
+import { MyObjectsDefinitions, BasicStates, buildCommon } from './lib/stateDefinitions';
+
+const activeDevices: activeDevices = {};
+const polling: { [key: string]: object } = {};
+const ipSerialMapping: { [key: string]: { ip: string } } = {};
+const createdObjs: string[] = [];
+let initializing = true;
+
+class WlanthermoNano extends utils.Adapter {
+	public constructor(options: Partial<utils.AdapterOptions> = {}) {
+		super({
+			...options,
+			name: 'wlanthermo-nano',
+		});
+		this.on('ready', this.onReady.bind(this));
+		this.on('stateChange', this.onStateChange.bind(this));
+		this.on('unload', this.onUnload.bind(this));
+	}
+
+	/**
+	 * Is called when databases are connected and adapter received configuration.
+	 */
+	private async onReady(): Promise<void> {
+		this.setState('info.connection', false, true);
+		const devices: DeviceList = this.config.deviceList;
+		this.log.info(`WLANThermo startet, loading ${devices.length} devices`);
+		this.log.debug(`Configured  devices ${devices}`);
+
+		// Connect to all devices configured in Adapter Instance
+		let amountConnected = 0;
+		for (const device in devices) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			activeDevices[devices[device].ip] = {};
+			activeDevices[devices[device].ip].basicInfo = devices[device];
+			activeDevices[devices[device].ip].initialised = false;
+			// Start interval
+			await this.getDeviceData(devices[device].ip);
+			if (activeDevices[devices[device].ip].initialised) {
+				amountConnected = amountConnected + 1;
+			}
+		}
+
+		// Adapter ready
+		initializing = false;
+		this.log.info(`WLANThermo ready, ${amountConnected} device(s) connected`);
+		this.setState('info.connection', true, true);
+	}
+
+	private async getDeviceData(deviceIP: string): Promise<void> {
+		try {
+			if (
+				activeDevices[deviceIP] == null ||
+				activeDevices[deviceIP].deviceURL == null ||
+				!activeDevices[deviceIP].initialised
+			) {
+				this.log.debug(`${deviceIP} not initialised, try to connect`);
+				await this.initialiseDevice(deviceIP);
+			} else {
+				this.log.debug(`${deviceIP} initialised, update data`);
+				const response_deviceData = await axios(activeDevices[deviceIP].deviceURL + '/data', { timeout: 5000 });
+				activeDevices[deviceIP].data = response_deviceData.data;
+				this.log.debug(`${deviceIP} data | ${JSON.stringify(response_deviceData.data)}`);
+				const serial: string = activeDevices[deviceIP].settings.device.serial;
+
+				// Write states for configuration channel
+				for (const i in activeDevices[deviceIP].data.system) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					const value = activeDevices[deviceIP].data.system[i];
+					this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
+					await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
+				}
+
+				// Read all sensor related settings and write to states
+				const channel = activeDevices[deviceIP].data.channel;
+				for (const i in channel) {
+					const sensorRoot = `${serial}.Sensors.Sensor_${1 + parseInt(i)}`;
+					this.log.debug(`Create sensor states ${sensorRoot}`);
+					await this.setObjectNotExistsAsync(sensorRoot, {
+						type: 'channel',
+						common: {
+							name: channel[i].name,
+						},
+						native: {},
+					});
+
+					// Load available sensor types
+					const sensorTypes: { [key: string]: string } = {};
+					for (const sensor in activeDevices[deviceIP].settings.sensors) {
+						sensorTypes[sensor] = activeDevices[deviceIP].settings.sensors[sensor].name;
+					}
+
+					//  Write states for temperature sensors
+					for (const y in channel[i]) {
+						switch (y) {
+							case 'typ':
+								await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+									type: 'state',
+									common: {
+										name: y,
+										role: 'switch.mode',
+										read: true,
+										type: 'number',
+										write: true,
+										states: sensorTypes,
+										def: 0,
+									},
+									native: {},
+								});
+
+								this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
+								this.subscribeStates(`${sensorRoot}.${y}`);
+
+								break;
+
+							case 'alarm':
+								await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+									type: 'state',
+									common: {
+										name: y,
+										role: 'indicator.alarm',
+										read: true,
+										type: 'number',
+										write: false,
+										states: {
+											'0': 'Disabled',
+											'1': 'Push-Only',
+											'2': 'Speaker-Only',
+											'4': 'Push & Speaker',
+										},
+										def: 0,
+									},
+									native: {},
+								});
+								this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
+								this.subscribeStates(`${sensorRoot}.${y}`);
+
+								break;
+
+							case 'temp':
+								await this.setObjectAndState(`${sensorRoot}`, `${y}`, null);
+								if (channel[i][y] !== 999) {
+									this.setState(`${sensorRoot}.${y}`, {
+										val: channel[i][y],
+										ack: true,
+										expire: activeDevices[deviceIP].basicInfo.interval * 2000,
+									});
+								} else {
+									this.setState(`${sensorRoot}.${y}`, { val: null, ack: true });
+								}
+								break;
+
+							default:
+								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+								// @ts-ignore
+								await this.setObjectAndState(`${sensorRoot}`, `${y}`, channel[i][y]);
+								this.subscribeStates(`${sensorRoot}.${y}`);
+						}
+					}
+				}
+
+				//  Write states for pitmaster
+				const pitmaster = activeDevices[deviceIP].data.pitmaster;
+				for (const i in pitmaster.pm) {
+					const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + parseInt(i)}`;
+					this.log.debug(`Create Pitmaster states ${stateRoot}`);
+					await this.setObjectNotExistsAsync(stateRoot, {
+						type: 'channel',
+						common: {
+							name: 'Pitmaster',
+						},
+						native: {},
+					});
+
+					for (const y in pitmaster.pm[i]) {
+						if (y === 'typ') {
+							await this.setObjectAndState(`${stateRoot}`, `modus`, pitmaster.pm[i][y]);
+							// Subscribe on state
+							// this.subscribeStates(`${stateRoot}.modus`);
+						} else if (y === 'pid') {
+							await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
+							// Subscribe on state
+							// this.subscribeStates(`${stateRoot}.${y}`);
+						} else if (y === 'set_color') {
+							// ignore set_color
+						} else if (y === 'value_color') {
+							// ignore set_color
+						} else {
+							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+							// @ts-ignore
+							await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
+						}
+					}
+				}
+				this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
+					val: true,
+					ack: true,
+				});
+			}
+		} catch (e) {
+			this.log.debug(`[getDeviceData] ${e}`);
+			if (activeDevices[deviceIP].initialised) {
+				this.log.warn(`${deviceIP} Connection lost, will try to reconnect`);
+			}
+			activeDevices[deviceIP].initialised = false;
+			try {
+				this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
+					val: false,
+					ack: true,
+				});
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		// Clear running timer
+		if (polling[deviceIP]) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			clearTimeout(polling[deviceIP]);
+			polling[deviceIP] = {};
+		}
+
+		// Timer to reload data
+		this.log.debug(`${deviceIP} Timer triggered`);
+		polling[deviceIP] = setTimeout(() => {
+			this.log.debug(`${deviceIP} Timer executed`);
+			this.getDeviceData(deviceIP);
+		}, activeDevices[deviceIP].basicInfo.interval * 1000);
+	}
+
+	private async initialiseDevice(ip: string): Promise<void> {
+		try {
+			const device: Device = activeDevices[ip].basicInfo;
+			const url = `http://${device.username}:${device.password}@${device.ip}`;
+
+			// Get Device Settings
+			const response_settings = await axios(url + '/settings', { timeout: 5000 });
+			if (response_settings == null || response_settings.data == null) return;
+			this.log.debug(`${ip} data | ${JSON.stringify(response_settings.data)}`);
+			const responseData: DeviceSettings = response_settings.data;
+			// Store all data into memory
+			activeDevices[device.ip].deviceURL = url;
+			activeDevices[device.ip].settings = responseData;
+			activeDevices[device.ip].initialised = true;
+			ipSerialMapping[activeDevices[device.ip].settings.device.serial] = { ip: device.ip };
+
+			this.log.debug(`${ip} memory cache | ${JSON.stringify(activeDevices[device.ip])}`);
+
+			// Create channels
+			await this.deviceStructures(activeDevices[device.ip].settings.device.serial, device.ip);
+			// Create States for device settings
+			for (const i in response_settings.data.device) {
+				this.log.debug(
+					`Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${
+						response_settings.data.device[i]
+					}`,
+				);
+				await this.setObjectAndState(
+					`${activeDevices[device.ip].settings.device.serial}.Info`,
+					`${i}`,
+					`${response_settings.data.device[i]}`,
+				);
+			}
+			this.log.info(
+				`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`,
+			);
+			this.getDeviceData(ip);
+		} catch (e) {
+			this.log.debug(`[initialiseDevice] ${e}`);
+			if (initializing) {
+				this.log.warn(`${ip} Connection failed, will try again later ${e}`);
+			}
+			activeDevices[ip].initialised = false;
+		}
+	}
+
+	private async deviceStructures(serial: string, ip: string): Promise<void> {
+		try {
+			this.createDevice(serial, {
+				name: activeDevices[ip].settings.system.host,
+			});
+
+			for (const object in BasicStates) {
+				this.log.debug(`Create basic state ${serial}.${object}`);
+				await this.setObjectAndState(`${serial}`, `${object}`, null);
+			}
+		} catch (e) {
+			this.log.error(`[deviceStructures] ${e}`);
+			this.sendSentry(`[deviceStructures] ${e}`);
+		}
+	}
+
+	private async setObjectAndState(rootDIR: string, stateName: string, value: any | null): Promise<void> {
+		try {
+			let obj: MyObjectsDefinitions = BasicStates[stateName];
+
+			if (!obj) {
+				obj = buildCommon(stateName);
+			}
+
+			// Check if the object must be created
+			if (createdObjs.indexOf(`${rootDIR}.${stateName}`) === -1) {
+				await this.setObjectNotExistsAsync(`${rootDIR}.${stateName}`, {
+					type: obj.type,
+					common: JSON.parse(JSON.stringify(obj.common)),
+					native: JSON.parse(JSON.stringify(obj.native)),
+				});
+				// Remember created object for this runtime
+				createdObjs.push(`${rootDIR}.${stateName}`);
+			}
+
+			if (obj.common.write != null && obj.common.write) {
+				this.subscribeStates(`${rootDIR}.${stateName}`);
+			}
+
+			if (value != null) {
+				await this.setStateChangedAsync(`${rootDIR}.${stateName}`, {
+					val: value,
+					ack: true,
+				});
+			}
+		} catch (e) {
+			this.log.error(`[setObjectAndState] ${e}`);
+			this.sendSentry(`[setObjectAndState] ${e}`);
+		}
+	}
+
+	/**
+	 * Is called when adapter shuts down - callback has to be called under any circumstances!
+	 */
+	private onUnload(callback: () => void): void {
+		try {
+			// Clear running timer
+			for (const device in activeDevices) {
+				if (polling[device]) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					clearTimeout(polling[device]);
+					polling[device] = {};
+				}
+				this.setState(`${activeDevices[device].settings.device.serial}.Info.connected`, {
+					val: false,
+					ack: true,
+				});
+			}
+
+			callback();
+		} catch (e) {
+			this.log.error(`[onUnload] ${e}`);
+			this.sendSentry(`[onUnload] ${e}`);
+			callback();
+		}
+	}
+
+	/**
+	 * Is called if a subscribed state changes
+	 */
+	private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
+		try {
+			if (state) {
+				// The state was changed
+				this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+				//Only fire when ack = false (set by admin or script)
+				if (!state.ack) {
+					this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+					const deviceId = id.split('.');
+
+					const deviceIP = ipSerialMapping[deviceId[2]].ip;
+					const url = activeDevices[deviceIP].deviceURL;
+					this.log.debug('Triggered state : ' + deviceId[3]);
+					// Handle Post command for configuration related settings
+					if (deviceId[3] === 'Configuration') {
+						if (deviceId[4] === 'restart') {
+							const post_url = `${url}/restart`;
+							const response = await axios.post(post_url);
+							this.setState(`${id}`, { val: false, ack: true });
+							this.log.info(`${deviceIP} restart requested ${response.status}`);
+							activeDevices[deviceIP].initialised = false;
+						} else if (deviceId[4] === 'checkupdate') {
+							const post_url = `${url}/checkupdate`;
+							const response = await axios.post(post_url);
+							this.setState(`${id}`, { val: false, ack: true });
+							this.log.info(`${deviceIP} check for updates ${response.status}`);
+						} else if (deviceId[4] === 'update') {
+							const post_url = `${url}/update`;
+							const response = await axios.post(post_url);
+							this.setState(`${id}`, { val: false, ack: true });
+							this.log.info(`${deviceIP} device update requested ${response.status}`);
+						} else {
+							/**
+
+							 // ToDo: Define logic for config changes
+							this.log.debug('Change in configuration settings');
+							// ToDo: Update value of state change to memory
+							// const array = {
+							// 	ap: activeDevices['ip'].settings.system.ap,
+							// 	host: activeDevices['ip'].settings.system.host,
+							// 	language: activeDevices['ip'].settings.system.language,
+							// 	unit: activeDevices['ip'].settings.system.unit,
+							// 	// 'hwalarm': false,
+							// 	// 'fastmode': false,
+							// 	autoupd: activeDevices['ip'].settings.system.autoupd,
+							// 	hwversion: activeDevices['ip'].settings.system.hwversion,
+							// };
+
+							//ToDo: Add case routine to only send relevant post request
+							// this.log.debug(JSON.stringify(array));
+							// this.sendArray(array, '/setsystem');
+							 */
+						}
+
+						// Handle Post command for sensor related settings
+					} else if (deviceId[3] === 'Sensors') {
+						// Update value of state change to memory
+						const sensorID = parseInt(deviceId[4].replace('Sensor_', '')) - 1;
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						activeDevices[deviceIP].data.channel[sensorID][deviceId[5]] = state.val;
+						// Prepare configuration data as array
+						const array = {
+							number: activeDevices[deviceIP].data.channel[sensorID].number,
+							name: activeDevices[deviceIP].data.channel[sensorID].name,
+							typ: activeDevices[deviceIP].data.channel[sensorID].typ,
+							min: activeDevices[deviceIP].data.channel[sensorID].min,
+							max: activeDevices[deviceIP].data.channel[sensorID].max,
+							alarm: activeDevices[deviceIP].data.channel[sensorID].alarm,
+							color: activeDevices[deviceIP].data.channel[sensorID].color,
+						};
+
+						this.log.info(
+							`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
+						);
+						// Send changes
+						await this.sendArray(url, array, '/setchannels');
+						// Refresh states
+						await this.getDeviceData(deviceIP);
+					} else {
+						try {
+							/**
+
+							// ToDo: build logic for pidmaster changes
+							this.log.debug(
+								`Change in Pidmaster settings ${id} | ${state.val}`
+							);
+
+							const modus = await this.getStateAsync(
+								deviceId[2] + '.' + deviceId[3] + '.' + deviceId[4] + '.' + 'modus',
+							);
+							const array = [
+								{
+									id: activeDevices[deviceIP].data.pitmaster[0].id,
+									channel: activeDevices[deviceIP].data.pitmaster[0].channel,
+									pid: activeDevices[deviceIP].data.pitmaster[0].pid,
+									value: activeDevices[deviceIP].data.pitmaster[0].value,
+									set: activeDevices[deviceIP].data.pitmaster[0].set,
+									typ: activeDevices[deviceIP].data.pitmaster[0].type,
+								},
+							];
+
+							this.log.debug(JSON.stringify(array));
+							this.sendArray(array, '/setpitmaster');
+							 */
+						} catch (e) {
+							this.log.error('Error in handling pitmaster state change' + e);
+						}
+					}
+				}
+			} else {
+				// The state was deleted
+				this.log.debug(`state ${id} deleted`);
+			}
+		} catch (e) {
+			this.log.error(`[onStateChange] ${e}`);
+			this.sendSentry(`[onStateChange] ${e}`);
+		}
+	}
+
+	private async sendArray(url: string | undefined, array: object, type: string): Promise<any> {
+		try {
+			this.log.debug(`Send config change ${JSON.stringify(array)}`);
+			if (url == null) return;
+			const post_url = `${url}${type}`;
+			const respons = axios.post(post_url, array);
+			return respons;
+		} catch (e) {
+			this.log.error(`[sendArray] ${e}`);
+			this.sendSentry(`[sendArray] ${e}`);
+		}
+	}
+
+	private sendSentry(error: string): void {
+		if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
+			const sentryInstance = this.getPluginInstance('sentry');
+			if (sentryInstance) {
+				sentryInstance.getSentryObject().captureException(error);
+			}
+		}
+	}
+}
+
+if (require.main !== module) {
+	// Export the constructor in compact mode
+	module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new WlanthermoNano(options);
+} else {
+	// otherwise start the instance directly
+	(() => new WlanthermoNano())();
+}

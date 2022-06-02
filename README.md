@@ -18,15 +18,12 @@
 ## Configuration
 
 The adapter can be installed and configured within the admin interface.
-Please enter IP-adress, username and password in the instance configuration.
+Please enter IP-address, username and password in the instance configuration.
 
 ## To-Do
 
-* [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
 * [ ] Implement auto device detect
-* [ ] Implement device online state
-* [x] allow multiple devices
-* [ ] code cleanup
+* [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
 
 ## Join the Discord server to discuss everything about ioBroker-WlanThermo integration!
 
@@ -39,12 +36,20 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
+### 0.2.0-beta.0 (2022-06-02) - Adapter rebuild to TypeScript
+* (DutchmanNL) Support multiple devices
+* (DutchmanNL) Error/debug logging Improved
+* (DutchmanNL) Adapter rebuild to TypeScript
+* (DutchmanNL) Test & Release workflow updated
+* (DutchmanNL) Added indicator for connection status
+* (DutchmanNL) Reconnecting to offline devices improved
+* (DutchmanNL) Ensure support of all WLANThermo-Nano Devices
 
 ### 0.1.2
 * (DutchmanNL) Support multiple devices
 
 ### 0.1.1
-* (DutchmanNL) Code optimalisation
+* (DutchmanNL) Code optimisation
 * (DutchmanNL) Implement state_attr.js to handle state options outside of source code
 * (DutchmanNL) Optimised state creation in 1 function
 * (DutchmanNL) Small cleanups

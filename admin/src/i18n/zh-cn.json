@@ -1,0 +1,11 @@
+{
+    "wlanthermo-nano adapter settings": "wlanthermo-nano的适配器设置",
+    "option1": "选项1",
+    "option2": "选项2",
+    "WLANThermo-Nano adapter settings": "WLANThermo-Nano 的适配器设置",
+    "Interval in seconds": "以秒为单位的间隔",
+    "IP-Address": "IP地址",
+    "Password": "密码",
+    "Please provide IP-Address and logon credentials of WLANThermo-Nano device": "请提供 WLANThermo-Nano 设备的 IP 地址和登录凭据",
+    "Username": "用户名"
+}

@@ -1,127 +1,170 @@
 {
-	"common": {
-		"name": "wlanthermo-nano",
-		"version": "0.1.2",
-		"news": {
-			"0.1.2": {
-				"en": "Support multiple devices",
-				"de": "Unterstützt mehrere Geräte",
-				"ru": "Поддержка нескольких устройств",
-				"pt": "Suporta vários dispositivos",
-				"nl": "Ondersteuning van meerdere apparaten",
-				"fr": "Soutenir plusieurs appareils",
-				"it": "Supporta più dispositivi",
-				"es": "Soporta múltiples dispositivos",
-				"pl": "Obsługuje wiele urządzeń",
-				"zh-cn": "支持多种设备"
-			},
-			"0.1.1": {
-				"en": "Code optimalisation",
-				"de": "Code-Optimierung",
-				"ru": "Оптимизация кода",
-				"pt": "Otimização de código",
-				"nl": "Optimalisatie van code",
-				"fr": "Optimisation du code",
-				"it": "Ottimizzazione del codice",
-				"es": "Optimización de código",
-				"pl": "Optymalizacja kodu",
-				"zh-cn": "代码优化"
-			},
-			"0.1.0": {
-				"en": "Optimise state settings with dropdown menu,  Pidmaster integration",
-				"de": "Optimieren Sie die Statuseinstellungen mit dem Dropdown-Menü Pidmaster-Integration",
-				"ru": "Оптимизация настроек состояния с помощью выпадающего меню, интеграция с Pidmaster",
-				"pt": "Otimize as configurações de estado com o menu suspenso, integração Pidmaster",
-				"nl": "Optimaliseer de statusinstellingen met het vervolgkeuzemenu, Pidmaster-integratie",
-				"fr": "Optimiser les paramètres d'état avec le menu déroulant, intégration Pidmaster",
-				"it": "Ottimizza le impostazioni dello stato con il menu a discesa, l'integrazione di Pidmaster",
-				"es": "Optimizar la configuración de estado con menú desplegable, integración Pidmaster",
-				"pl": "Zoptymalizuj ustawienia stanu za pomocą menu rozwijanego, integracji Pidmaster",
-				"zh-cn": "使用下拉菜单，Pidmaster集成优化状态设置"
-			},
-			"0.0.2": {
-					"en": "initial release",
-					"de": "Erstveröffentlichung",
-					"ru": "Первый выпуск",
-					"pt": "lançamento inicial",
-					"nl": "Eerste uitgave",
-					"fr": "Première version",
-					"it": "Versione iniziale",
-					"es": "Versión inicial",
-					"pl": "Pierwsze wydanie",
-					"zh-cn": "初始发行"
-			}
-		},
-		"title": "WLANThermo-Nano",
-		"titleLang": {
-			"en": "WLANThermo-Nano",
-			"de": "WLANThermo-Nano",
-			"ru": "WLANThermo-Nano",
-			"pt": "WLANThermo-Nano",
-			"nl": "WLANThermo-Nano",
-			"fr": "WLANThermo-Nano",
-			"it": "WLANThermo-Nano",
-			"es": "WLANThermo-Nano",
-			"pl": "WLANThermo-Nano",
-			"zh-cn": "WLANThermo纳"
-		},
-		"desc": {
-			"en": "WLANThermo Nano, the digital advantage for your barbecue sport",
-			"de": "WLANThermo Nano, der digitale Vorteil für Ihren Grillsport",
-			"ru": "WLANThermo Nano, цифровое преимущество для вашего барбекю спорта",
-			"pt": "WLANThermo Nano, a vantagem digital para o seu esporte de churrasco",
-			"nl": "WLANThermo Nano, het digitale voordeel voor uw barbecuesport",
-			"fr": "WLANThermo Nano, l'avantage numérique de votre sport de barbecue",
-			"it": "WLANThermo Nano, il vantaggio digitale per il tuo sport barbecue",
-			"es": "WLANThermo Nano, la ventaja digital para tu deporte de barbacoa",
-			"pl": "WLANThermo Nano, cyfrowa zaleta dla Twojego grilla",
-			"zh-cn": "WLANThermo Nano，为您的烧烤运动提供数字优势"
-		},
-		"authors": [
-			"DutchmanNL <rdrozda86@gmail.com>"
-		],
-		"contributors": [
-			"Jey-Cee"
-		  ],
-		"keywords": [
-			"WLANThermo",
-			"barbecue",
-			"sensor"
-		],
-		"license": "MIT",
-		"platform": "Javascript/Node.js",
-		"main": "main.js",
-		"icon": "wlanthermo-nano.png",
-		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/master/admin/wlanthermo-nano.png",
-		"readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/master/README.md",
-		"loglevel": "info",
-		"mode": "daemon",
-		"type": "household",
-		"compact": true,
-		"materialize": true,
-		"plugins": {
-			"sentry": {
-				"dsn": "https://a1dee206514f444d843940f8b443d47d@sentry.iobroker.net/26"
-			}
-		},
-		"dependencies": [
-			{
-				"js-controller": ">=1.4.2"
-			}
-		]
-	},
-	"native": {
-		"devices": [
-			{
-			  "username": "admin",
-			  "password": "admin",
-			  "ip": "192.168.xxx.xxx",
-			  "port": "80"
-			}
-		  ],
-		  "intervallTime": 10
-		},
-	"objects": [],
-	"instanceObjects": []
+  "common": {
+    "name": "wlanthermo-nano",
+    "version": "0.2.0-beta.0",
+    "news": {
+      "0.2.0-beta.0": {
+        "en": "Support multiple devices\nError/debug logging Improved\nAdapter rebuild to TypeScript\nTest & Release workflow updated\nAdded indicator for connection status\nReconnecting to offline devices improved\nEnsure support of all WLANThermo-Nano Devices",
+        "de": "Unterstützt mehrere Geräte\nFehler-/Debug-Protokollierung Verbessert\nUmbau des Adapters auf TypeScript\nTest- und Release-Workflow aktualisiert\nIndikator für den Verbindungsstatus hinzugefügt\nWiederverbinden mit Offline-Geräten verbessert\nStellen Sie sicher, dass alle WLANThermo-Nano-Geräte unterstützt werden",
+        "ru": "Поддержка нескольких устройств\nВедение журнала ошибок/отладки Улучшено\nАдаптер пересобран на TypeScript\nОбновлен рабочий процесс тестирования и выпуска\nДобавлен индикатор состояния соединения\nУлучшено повторное подключение к автономным устройствам.\nОбеспечьте поддержку всех устройств WLANThermo-Nano",
+        "pt": "Suporta vários dispositivos\nRegistro de erros/depuração aprimorado\nReconstrução do adaptador para TypeScript\nFluxo de trabalho de teste e lançamento atualizado\nIndicador adicionado para o status da conexão\nReconectando-se a dispositivos off-line aprimorado\nGaranta o suporte de todos os dispositivos WLANThermo-Nano",
+        "nl": "Ondersteuning voor meerdere apparaten\nLogboekregistratie van fouten/foutopsporing Verbeterd\nAdapter opnieuw opbouwen naar TypeScript\nTest & Release-workflow bijgewerkt\nIndicator toegevoegd voor verbindingsstatus\nOpnieuw verbinding maken met offline apparaten verbeterd\nZorg voor ondersteuning van alle WLANThermo-Nano-apparaten",
+        "fr": "Prend en charge plusieurs appareils\nJournalisation des erreurs/débogages Amélioré\nReconstruction de l'adaptateur vers TypeScript\nFlux de travail de test et de publication mis à jour\nIndicateur ajouté pour l'état de la connexion\nReconnexion à des appareils hors ligne améliorée\nAssurer la prise en charge de tous les périphériques WLANThermo-Nano",
+        "it": "Supporta più dispositivi\nRegistrazione errori/debug Migliorata\nRicostruzione dell'adattatore in TypeScript\nFlusso di lavoro di test e rilascio aggiornato\nAggiunto indicatore per lo stato della connessione\nRiconnessione ai dispositivi offline migliorata\nGarantire il supporto di tutti i dispositivi WLANThermo-Nano",
+        "es": "Soporta múltiples dispositivos\nRegistro de error/depuración Mejorado\nReconstrucción del adaptador a TypeScript\nFlujo de trabajo de prueba y lanzamiento actualizado\nIndicador agregado para el estado de la conexión.\nSe mejoró la reconexión a dispositivos sin conexión\nAsegurar el soporte de todos los dispositivos WLANThermo-Nano",
+        "pl": "Obsługa wielu urządzeń\nRejestrowanie błędów/debugów Ulepszone\nOdbudowa adaptera do TypeScript\nZaktualizowano przepływ pracy Test & Release\nDodano wskaźnik statusu połączenia\nUlepszone ponowne łączenie z urządzeniami offline\nZapewnij obsługę wszystkich urządzeń WLANThermo-Nano",
+        "zh-cn": "支持多种设备\n错误/调试日志记录改进\n适配器重建到 TypeScript\n测试和发布工作流程更新\n添加了连接状态指示器\n重新连接到离线设备得到改进\n确保支持所有 WLANThermo-Nano 设备"
+      },
+      "0.1.2": {
+        "en": "Support multiple devices",
+        "de": "Unterstützt mehrere Geräte",
+        "ru": "Поддержка нескольких устройств",
+        "pt": "Suporta vários dispositivos",
+        "nl": "Ondersteuning van meerdere apparaten",
+        "fr": "Soutenir plusieurs appareils",
+        "it": "Supporta più dispositivi",
+        "es": "Soporta múltiples dispositivos",
+        "pl": "Obsługuje wiele urządzeń",
+        "zh-cn": "支持多种设备"
+      },
+      "0.1.1": {
+        "en": "Code optimalisation",
+        "de": "Code-Optimierung",
+        "ru": "Оптимизация кода",
+        "pt": "Otimização de código",
+        "nl": "Optimalisatie van code",
+        "fr": "Optimisation du code",
+        "it": "Ottimizzazione del codice",
+        "es": "Optimización de código",
+        "pl": "Optymalizacja kodu",
+        "zh-cn": "代码优化"
+      },
+      "0.1.0": {
+        "en": "Optimise state settings with dropdown menu,  Pidmaster integration",
+        "de": "Optimieren Sie die Statuseinstellungen mit dem Dropdown-Menü Pidmaster-Integration",
+        "ru": "Оптимизация настроек состояния с помощью выпадающего меню, интеграция с Pidmaster",
+        "pt": "Otimize as configurações de estado com o menu suspenso, integração Pidmaster",
+        "nl": "Optimaliseer de statusinstellingen met het vervolgkeuzemenu, Pidmaster-integratie",
+        "fr": "Optimiser les paramètres d'état avec le menu déroulant, intégration Pidmaster",
+        "it": "Ottimizza le impostazioni dello stato con il menu a discesa, l'integrazione di Pidmaster",
+        "es": "Optimizar la configuración de estado con menú desplegable, integración Pidmaster",
+        "pl": "Zoptymalizuj ustawienia stanu za pomocą menu rozwijanego, integracji Pidmaster",
+        "zh-cn": "使用下拉菜单，Pidmaster集成优化状态设置"
+      },
+      "0.0.2": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Первый выпуск",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "zh-cn": "初始发行"
+      }
+    },
+    "title": "WLANThermo-Nano",
+    "titleLang": {
+      "en": "WLANThermo-Nano",
+      "de": "WLANThermo-Nano",
+      "ru": "WLANThermo-Nano",
+      "pt": "WLANThermo-Nano",
+      "nl": "WLANThermo-Nano",
+      "fr": "WLANThermo-Nano",
+      "it": "WLANThermo-Nano",
+      "es": "WLANThermo-Nano",
+      "pl": "WLANThermo-Nano",
+      "zh-cn": "WLANThermo纳"
+    },
+    "desc": {
+      "en": "WLANThermo Nano, the digital advantage for your barbecue sport",
+      "de": "WLANThermo Nano, der digitale Vorteil für Ihren Grillsport",
+      "ru": "WLANThermo Nano, цифровое преимущество для вашего барбекю спорта",
+      "pt": "WLANThermo Nano, a vantagem digital para o seu esporte de churrasco",
+      "nl": "WLANThermo Nano, het digitale voordeel voor uw barbecuesport",
+      "fr": "WLANThermo Nano, l'avantage numérique de votre sport de barbecue",
+      "it": "WLANThermo Nano, il vantaggio digitale per il tuo sport barbecue",
+      "es": "WLANThermo Nano, la ventaja digital para tu deporte de barbacoa",
+      "pl": "WLANThermo Nano, cyfrowa zaleta dla Twojego grilla",
+      "zh-cn": "WLANThermo Nano，为您的烧烤运动提供数字优势"
+    },
+    "authors": [
+      "DutchmanNL <oss@DrozmotiX.eu>"
+    ],
+    "keywords": [
+      "iobroker-adapter",
+      "WLANThermo",
+      "barbecue",
+      "sensor"
+    ],
+    "contributors": [
+      "Jey-Cee"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "build/main.js",
+    "icon": "wlanthermo-nano.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/main/admin/wlanthermo-nano.png",
+    "readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/main/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "household",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "materialize": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "plugins": {
+      "sentry": {
+        "dsn": "https://7c3dff9381a44d32b1b94e5bc827b09d@sentry.drozmotix.eu/3"
+      }
+    },
+    "eraseOnUpload": true,
+    "dependencies": [
+      {
+        "js-controller": ">=4.0.0"
+      }
+    ]
+  },
+  "encryptedNative": [
+    "password"
+  ],
+  "native": {
+    "deviceList": [
+      {
+        "interval": 30,
+        "ip": "192.168.10.119",
+        "password": "admin",
+        "username": "admin"
+      }
+    ]
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }

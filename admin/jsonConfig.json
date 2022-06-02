@@ -1,0 +1,23 @@
+{
+  "type": "panel",
+  "i18n": true,
+  "items": {
+    "_basicSettings": {
+      "newLine": true,
+      "type": "header",
+      "text": "Please provide IP-Address and logon credentials of WLANThermo-Nano device",
+      "sm": 12,
+      "size": 8
+    },
+    "deviceList": {
+      "sm": 12,
+      "type": "table",
+      "items": [
+        {"type": "text", "width": 2, "title": {"en": "ip-address"}, "attr": "ip", "filter": false, "sort": true, "default": ""},
+        {"type": "text", "width": 2, "title": {"en": "username"}, "attr": "username", "filter": false, "sort": true, "default": ""},
+        {"type": "password", "repeat": false, "width": 2, "title": {"en": "password"}, "attr": "password", "filter": false, "sort": true, "default": ""},
+        {"type": "number", "width": 2, "title": {"en": "interval in seconds"}, "attr": "interval", "filter": false, "sort": true, "default": 30}
+      ]
+    }
+  }
+}
