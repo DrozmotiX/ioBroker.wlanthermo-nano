@@ -1,8 +1,20 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.0.1",
+		"version": "0.2.0-alpha.0",
 		"news": {
+			"0.2.0-alpha.0": {
+				"en": "Adapter rebuild to TypeScript",
+				"de": "Umbau des Adapters auf TypeScript",
+				"ru": "Перестроение адаптера на TypeScript",
+				"pt": "Reconstrução do adaptador para TypeScript",
+				"nl": "Adapter opnieuw opbouwen naar TypeScript",
+				"fr": "Reconstruction de l'adaptateur vers TypeScript",
+				"it": "Ricostruzione dell'adattatore in TypeScript",
+				"es": "Reconstrucción del adaptador a TypeScript",
+				"pl": "Odbudowa adaptera do TypeScript",
+				"zh-cn": "适配器重建到 TypeScript"
+			},
 			"0.1.2": {
 				"en": "Support multiple devices",
 				"de": "Unterstützt mehrere Geräte",
