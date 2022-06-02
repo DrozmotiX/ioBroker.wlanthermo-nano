@@ -35,6 +35,7 @@ var import_axios = __toESM(require("axios"));
 var import_stateDefinitions = require("./lib/stateDefinitions");
 const activeDevices = {};
 const polling = {};
+const ipSerialMapping = {};
 const createdObjs = [];
 let initializing = true;
 class WlanthermoNano extends utils.Adapter {
@@ -50,6 +51,7 @@ class WlanthermoNano extends utils.Adapter {
     this.setState("info.connection", false, true);
     const devices = this.config.deviceList;
     this.log.info(`WLANThermo startet, loading ${devices.length} devices`);
+    this.log.debug(`Configured  devices ${devices}`);
     let amountConnected = 0;
     for (const device in devices) {
       activeDevices[devices[device].ip] = {};
@@ -67,18 +69,23 @@ class WlanthermoNano extends utils.Adapter {
   async getDeviceData(deviceIP) {
     try {
       if (activeDevices[deviceIP] == null || activeDevices[deviceIP].deviceURL == null || !activeDevices[deviceIP].initialised) {
+        this.log.debug(`${deviceIP} not initialised, try to connect`);
         await this.initialiseDevice(deviceIP);
       } else {
+        this.log.debug(`${deviceIP} initialised, update data`);
         const response_deviceData = await (0, import_axios.default)(activeDevices[deviceIP].deviceURL + "/data", { timeout: 5e3 });
         activeDevices[deviceIP].data = response_deviceData.data;
+        this.log.debug(`${deviceIP} data | ${JSON.stringify(response_deviceData.data)}`);
         const serial = activeDevices[deviceIP].settings.device.serial;
         for (const i in activeDevices[deviceIP].data.system) {
           const value = activeDevices[deviceIP].data.system[i];
+          this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
           await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
         }
         const channel = activeDevices[deviceIP].data.channel;
         for (const i in channel) {
           const sensorRoot = `${serial}.Sensors.Sensor_${1 + parseInt(i)}`;
+          this.log.debug(`Create sensor states ${sensorRoot}`);
           await this.setObjectNotExistsAsync(sensorRoot, {
             type: "channel",
             common: {
@@ -86,9 +93,9 @@ class WlanthermoNano extends utils.Adapter {
             },
             native: {}
           });
-          const sensorTypes = [];
+          const sensorTypes = {};
           for (const sensor in activeDevices[deviceIP].settings.sensors) {
-            sensorTypes.push(activeDevices[deviceIP].settings.sensors[sensor].name);
+            sensorTypes[sensor] = activeDevices[deviceIP].settings.sensors[sensor].name;
           }
           for (const y in channel[i]) {
             switch (y) {
@@ -107,6 +114,7 @@ class WlanthermoNano extends utils.Adapter {
                   native: {}
                 });
                 this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
+                this.subscribeStates(`${sensorRoot}.${y}`);
                 break;
               case "alarm":
                 await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
@@ -128,6 +136,7 @@ class WlanthermoNano extends utils.Adapter {
                   native: {}
                 });
                 this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
+                this.subscribeStates(`${sensorRoot}.${y}`);
                 break;
               case "temp":
                 await this.setObjectAndState(`${sensorRoot}`, `${y}`, null);
@@ -143,12 +152,14 @@ class WlanthermoNano extends utils.Adapter {
                 break;
               default:
                 await this.setObjectAndState(`${sensorRoot}`, `${y}`, channel[i][y]);
+                this.subscribeStates(`${sensorRoot}.${y}`);
             }
           }
         }
         const pitmaster = activeDevices[deviceIP].data.pitmaster;
         for (const i in pitmaster.pm) {
           const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + parseInt(i)}`;
+          this.log.debug(`Create Pitmaster states ${stateRoot}`);
           await this.setObjectNotExistsAsync(stateRoot, {
             type: "channel",
             common: {
@@ -159,10 +170,8 @@ class WlanthermoNano extends utils.Adapter {
           for (const y in pitmaster.pm[i]) {
             if (y === "typ") {
               await this.setObjectAndState(`${stateRoot}`, `modus`, pitmaster.pm[i][y]);
-              this.subscribeStates(`${stateRoot}.modus`);
             } else if (y === "pid") {
               await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
-              this.subscribeStates(`${stateRoot}.${y}`);
             } else if (y === "set_color") {
             } else if (y === "value_color") {
             } else {
@@ -176,7 +185,7 @@ class WlanthermoNano extends utils.Adapter {
         });
       }
     } catch (e) {
-      console.error(e);
+      this.log.debug(`[getDeviceData] ${e}`);
       if (activeDevices[deviceIP].initialised) {
         this.log.warn(`${deviceIP} Connection lost, will try to reconnect`);
       }
@@ -194,7 +203,9 @@ class WlanthermoNano extends utils.Adapter {
       clearTimeout(polling[deviceIP]);
       polling[deviceIP] = {};
     }
+    this.log.debug(`${deviceIP} Timer triggered`);
     polling[deviceIP] = setTimeout(() => {
+      this.log.debug(`${deviceIP} Timer executed`);
       this.getDeviceData(deviceIP);
     }, activeDevices[deviceIP].basicInfo.interval * 1e3);
   }
@@ -205,18 +216,22 @@ class WlanthermoNano extends utils.Adapter {
       const response_settings = await (0, import_axios.default)(url + "/settings", { timeout: 5e3 });
       if (response_settings == null || response_settings.data == null)
         return;
+      this.log.debug(`${ip} data | ${JSON.stringify(response_settings.data)}`);
       const responseData = response_settings.data;
       activeDevices[device.ip].deviceURL = url;
       activeDevices[device.ip].settings = responseData;
       activeDevices[device.ip].initialised = true;
+      ipSerialMapping[activeDevices[device.ip].settings.device.serial] = { ip: device.ip };
+      this.log.debug(`${ip} memory cache | ${JSON.stringify(activeDevices[device.ip])}`);
       await this.deviceStructures(activeDevices[device.ip].settings.device.serial, device.ip);
       for (const i in response_settings.data.device) {
+        this.log.debug(`Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${response_settings.data.device[i]}`);
         await this.setObjectAndState(`${activeDevices[device.ip].settings.device.serial}.Info`, `${i}`, `${response_settings.data.device[i]}`);
       }
       this.log.info(`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`);
       this.getDeviceData(ip);
     } catch (e) {
-      console.error(e);
+      this.log.debug(`[initialiseDevice] ${e}`);
       if (initializing) {
         this.log.warn(`${ip} Connection failed, will try again later ${e}`);
       }
@@ -229,10 +244,12 @@ class WlanthermoNano extends utils.Adapter {
         name: activeDevices[ip].settings.system.host
       });
       for (const object in import_stateDefinitions.BasicStates) {
+        this.log.debug(`Create basic state ${serial}.${object}`);
         await this.setObjectAndState(`${serial}`, `${object}`, null);
       }
     } catch (e) {
-      console.error(e);
+      this.log.error(`[deviceStructures] ${e}`);
+      this.sendSentry(`[deviceStructures] ${e}`);
     }
   }
   async setObjectAndState(rootDIR, stateName, value) {
@@ -249,6 +266,9 @@ class WlanthermoNano extends utils.Adapter {
         });
         createdObjs.push(`${rootDIR}.${stateName}`);
       }
+      if (obj.common.write != null && obj.common.write) {
+        this.subscribeStates(`${rootDIR}.${stateName}`);
+      }
       if (value != null) {
         await this.setStateChangedAsync(`${rootDIR}.${stateName}`, {
           val: value,
@@ -256,7 +276,8 @@ class WlanthermoNano extends utils.Adapter {
         });
       }
     } catch (e) {
-      console.error(e);
+      this.log.error(`[setObjectAndState] ${e}`);
+      this.sendSentry(`[setObjectAndState] ${e}`);
     }
   }
   onUnload(callback) {
@@ -273,13 +294,89 @@ class WlanthermoNano extends utils.Adapter {
       }
       callback();
     } catch (e) {
+      this.log.error(`[onUnload] ${e}`);
+      this.sendSentry(`[onUnload] ${e}`);
       callback();
     }
   }
-  onStateChange(id, state) {
-    if (state) {
-    } else {
-      this.log.info(`state ${id} deleted`);
+  async onStateChange(id, state) {
+    try {
+      if (state) {
+        this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+        if (!state.ack) {
+          this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+          const deviceId = id.split(".");
+          const deviceIP = ipSerialMapping[deviceId[2]].ip;
+          const url = activeDevices[deviceIP].deviceURL;
+          this.log.debug("Triggered state : " + deviceId[3]);
+          if (deviceId[3] === "Configuration") {
+            if (deviceId[4] === "restart") {
+              const post_url = `${url}/restart`;
+              const response = await import_axios.default.post(post_url);
+              this.setState(`${id}`, { val: false, ack: true });
+              this.log.info(`${deviceIP} restart requested ${response.status}`);
+              activeDevices[deviceIP].initialised = false;
+            } else if (deviceId[4] === "checkupdate") {
+              const post_url = `${url}/checkupdate`;
+              const response = await import_axios.default.post(post_url);
+              this.setState(`${id}`, { val: false, ack: true });
+              this.log.info(`${deviceIP} check for updates ${response.status}`);
+            } else if (deviceId[4] === "update") {
+              const post_url = `${url}/update`;
+              const response = await import_axios.default.post(post_url);
+              this.setState(`${id}`, { val: false, ack: true });
+              this.log.info(`${deviceIP} device update requested ${response.status}`);
+            } else {
+            }
+          } else if (deviceId[3] === "Sensors") {
+            const sensorID = parseInt(deviceId[4].replace("Sensor_", "")) - 1;
+            activeDevices[deviceIP].data.channel[sensorID][deviceId[5]] = state.val;
+            const array = {
+              number: activeDevices[deviceIP].data.channel[sensorID].number,
+              name: activeDevices[deviceIP].data.channel[sensorID].name,
+              typ: activeDevices[deviceIP].data.channel[sensorID].typ,
+              min: activeDevices[deviceIP].data.channel[sensorID].min,
+              max: activeDevices[deviceIP].data.channel[sensorID].max,
+              alarm: activeDevices[deviceIP].data.channel[sensorID].alarm,
+              color: activeDevices[deviceIP].data.channel[sensorID].color
+            };
+            this.log.info(`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
+            await this.sendArray(url, array, "/setchannels");
+            await this.getDeviceData(deviceIP);
+          } else {
+            try {
+            } catch (e) {
+              this.log.error("Error in handling pitmaster state change" + e);
+            }
+          }
+        }
+      } else {
+        this.log.debug(`state ${id} deleted`);
+      }
+    } catch (e) {
+      this.log.error(`[onStateChange] ${e}`);
+      this.sendSentry(`[onStateChange] ${e}`);
+    }
+  }
+  async sendArray(url, array, type) {
+    try {
+      this.log.debug(`Send config change ${JSON.stringify(array)}`);
+      if (url == null)
+        return;
+      const post_url = `${url}${type}`;
+      const respons = import_axios.default.post(post_url, array);
+      return respons;
+    } catch (e) {
+      this.log.error(`[sendArray] ${e}`);
+      this.sendSentry(`[sendArray] ${e}`);
+    }
+  }
+  sendSentry(error) {
+    if (this.supportsFeature && this.supportsFeature("PLUGINS")) {
+      const sentryInstance = this.getPluginInstance("sentry");
+      if (sentryInstance) {
+        sentryInstance.getSentryObject().captureException(error);
+      }
     }
   }
 }
