@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "wlanthermo-nano",
-    "version": "0.2.0-alpha.3",
+    "version": "0.2.0-beta.0",
     "news": {
+      "0.2.0-beta.0": {
+        "en": "Support multiple devices\nError/debug logging Improved\nAdapter rebuild to TypeScript\nTest & Release workflow updated\nAdded indicator for connection status\nReconnecting to offline devices improved\nEnsure support of all WLANThermo-Nano Devices",
+        "de": "Unterstützt mehrere Geräte\nFehler-/Debug-Protokollierung Verbessert\nUmbau des Adapters auf TypeScript\nTest- und Release-Workflow aktualisiert\nIndikator für den Verbindungsstatus hinzugefügt\nWiederverbinden mit Offline-Geräten verbessert\nStellen Sie sicher, dass alle WLANThermo-Nano-Geräte unterstützt werden",
+        "ru": "Поддержка нескольких устройств\nВедение журнала ошибок/отладки Улучшено\nАдаптер пересобран на TypeScript\nОбновлен рабочий процесс тестирования и выпуска\nДобавлен индикатор состояния соединения\nУлучшено повторное подключение к автономным устройствам.\nОбеспечьте поддержку всех устройств WLANThermo-Nano",
+        "pt": "Suporta vários dispositivos\nRegistro de erros/depuração aprimorado\nReconstrução do adaptador para TypeScript\nFluxo de trabalho de teste e lançamento atualizado\nIndicador adicionado para o status da conexão\nReconectando-se a dispositivos off-line aprimorado\nGaranta o suporte de todos os dispositivos WLANThermo-Nano",
+        "nl": "Ondersteuning voor meerdere apparaten\nLogboekregistratie van fouten/foutopsporing Verbeterd\nAdapter opnieuw opbouwen naar TypeScript\nTest & Release-workflow bijgewerkt\nIndicator toegevoegd voor verbindingsstatus\nOpnieuw verbinding maken met offline apparaten verbeterd\nZorg voor ondersteuning van alle WLANThermo-Nano-apparaten",
+        "fr": "Prend en charge plusieurs appareils\nJournalisation des erreurs/débogages Amélioré\nReconstruction de l'adaptateur vers TypeScript\nFlux de travail de test et de publication mis à jour\nIndicateur ajouté pour l'état de la connexion\nReconnexion à des appareils hors ligne améliorée\nAssurer la prise en charge de tous les périphériques WLANThermo-Nano",
+        "it": "Supporta più dispositivi\nRegistrazione errori/debug Migliorata\nRicostruzione dell'adattatore in TypeScript\nFlusso di lavoro di test e rilascio aggiornato\nAggiunto indicatore per lo stato della connessione\nRiconnessione ai dispositivi offline migliorata\nGarantire il supporto di tutti i dispositivi WLANThermo-Nano",
+        "es": "Soporta múltiples dispositivos\nRegistro de error/depuración Mejorado\nReconstrucción del adaptador a TypeScript\nFlujo de trabajo de prueba y lanzamiento actualizado\nIndicador agregado para el estado de la conexión.\nSe mejoró la reconexión a dispositivos sin conexión\nAsegurar el soporte de todos los dispositivos WLANThermo-Nano",
+        "pl": "Obsługa wielu urządzeń\nRejestrowanie błędów/debugów Ulepszone\nOdbudowa adaptera do TypeScript\nZaktualizowano przepływ pracy Test & Release\nDodano wskaźnik statusu połączenia\nUlepszone ponowne łączenie z urządzeniami offline\nZapewnij obsługę wszystkich urządzeń WLANThermo-Nano",
+        "zh-cn": "支持多种设备\n错误/调试日志记录改进\n适配器重建到 TypeScript\n测试和发布工作流程更新\n添加了连接状态指示器\n重新连接到离线设备得到改进\n确保支持所有 WLANThermo-Nano 设备"
+      },
       "0.1.2": {
         "en": "Support multiple devices",
         "de": "Unterstützt mehrere Geräte",

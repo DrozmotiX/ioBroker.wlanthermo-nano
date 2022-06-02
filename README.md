@@ -36,7 +36,7 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
-### 0.2.0-alpha.3 (2022-06-02) - Adapter rebuild to TypeScript
+### 0.2.0-beta.0 (2022-06-02) - Adapter rebuild to TypeScript
 * (DutchmanNL) Support multiple devices
 * (DutchmanNL) Error/debug logging Improved
 * (DutchmanNL) Adapter rebuild to TypeScript
