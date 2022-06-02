@@ -24,7 +24,7 @@ Please enter IP-adress, username and password in the instance configuration.
 
 * [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
 * [ ] Implement auto device detect
-* [ ] Implement device online state
+* [x] Implement device online state
 * [x] allow multiple devices
 * [ ] code cleanup
 
@@ -39,6 +39,9 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
+### __WORK IN PROGRESS__ - Adapter rebuild to TypeScript
+* (DutchmanNL) Adapter rebuild to TypeScript
+* (DutchmanNL) Test & Release workflow updated
 
 ### 0.1.2
 * (DutchmanNL) Support multiple devices
