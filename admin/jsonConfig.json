@@ -9,32 +9,6 @@
       "sm": 12,
       "size": 8
     },
-    "username": {
-      "newLine": true,
-      "type": "text",
-      "label": "Username",
-      "sm": 3
-    },
-    "password": {
-      "repeat": false,
-      "visible": false,
-      "sm": 3,
-      "type": "password",
-      "label": "Password"
-    },
-    "ip": {
-      "sm": 3,
-      "type": "ip",
-      "label": "Ip address of device"
-    },
-    "interval": {
-      "sm": 2,
-      "type": "number",
-      "label": "Interval in seconds",
-      "min" : 10,
-      "max" : 300,
-      "step": 5
-    },
     "deviceList": {
       "sm": 12,
       "type": "table",

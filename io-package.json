@@ -90,14 +90,15 @@
 			"zh-cn": "WLANThermo Nano，为您的烧烤运动提供数字优势"
 		},
 		"authors": ["DutchmanNL <oss@DrozmotiX.eu>"],
-		"keywords": ["iobroker-adapter"],
-		"contributors": [
-			"Jey-Cee"
-		  ],
+		"keywords": [
+			"iobroker-adapter",
 			"WLANThermo",
 			"barbecue",
 			"sensor"
 		],
+		"contributors": [
+			"Jey-Cee"
+		  ],
 		"license": "MIT",
 		"platform": "Javascript/Node.js",
 		"main": "build/main.js",
@@ -131,10 +132,14 @@
 		"password"
 	],
 	"native": {
-		"username": "admin",
-		"password": "admin",
-		"interval": 30,
-		"ip": "192.168.xxx.xxx"
+		"deviceList": [
+			{
+				"interval": 30,
+				"ip": "192.168.10.119",
+				"password": "admin",
+				"username": "admin"
+			}
+		]
 	},
 	"objects": [],
 	"instanceObjects": [
