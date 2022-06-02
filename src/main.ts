@@ -34,6 +34,7 @@ class WlanthermoNano extends utils.Adapter {
 		this.setState('info.connection', false, true);
 		const devices: DeviceList = this.config.deviceList;
 		this.log.info(`WLANThermo startet, loading ${devices.length} devices`);
+		this.log.debug(`Configured  devices ${devices}`);
 
 		// Connect to all devices configured in Adapter Instance
 		let amountConnected = 0;
@@ -63,11 +64,13 @@ class WlanthermoNano extends utils.Adapter {
 				activeDevices[deviceIP].deviceURL == null ||
 				!activeDevices[deviceIP].initialised
 			) {
+				this.log.debug(`${deviceIP} not initialised, try to connect`);
 				await this.initialiseDevice(deviceIP);
 			} else {
-				// Get Device Data
+				this.log.debug(`${deviceIP} initialised, update data`);
 				const response_deviceData = await axios(activeDevices[deviceIP].deviceURL + '/data', { timeout: 5000 });
 				activeDevices[deviceIP].data = response_deviceData.data;
+				this.log.debug(`${deviceIP} data | ${JSON.stringify(response_deviceData.data)}`);
 				const serial: string = activeDevices[deviceIP].settings.device.serial;
 
 				// Write states for configuration channel
@@ -75,6 +78,7 @@ class WlanthermoNano extends utils.Adapter {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					const value = activeDevices[deviceIP].data.system[i];
+					this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
 					await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
 				}
 
@@ -82,6 +86,7 @@ class WlanthermoNano extends utils.Adapter {
 				const channel = activeDevices[deviceIP].data.channel;
 				for (const i in channel) {
 					const sensorRoot = `${serial}.Sensors.Sensor_${1 + parseInt(i)}`;
+					this.log.debug(`Create sensor states ${sensorRoot}`);
 					await this.setObjectNotExistsAsync(sensorRoot, {
 						type: 'channel',
 						common: {
@@ -166,6 +171,7 @@ class WlanthermoNano extends utils.Adapter {
 				const pitmaster = activeDevices[deviceIP].data.pitmaster;
 				for (const i in pitmaster.pm) {
 					const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + parseInt(i)}`;
+					this.log.debug(`Create Pitmaster states ${stateRoot}`);
 					await this.setObjectNotExistsAsync(stateRoot, {
 						type: 'channel',
 						common: {
@@ -200,7 +206,7 @@ class WlanthermoNano extends utils.Adapter {
 				});
 			}
 		} catch (e) {
-			console.error(e);
+			this.log.debug(`[getDeviceData] ${e}`);
 			if (activeDevices[deviceIP].initialised) {
 				this.log.warn(`${deviceIP} Connection lost, will try to reconnect`);
 			}
@@ -224,7 +230,9 @@ class WlanthermoNano extends utils.Adapter {
 		}
 
 		// Timer to reload data
+		this.log.debug(`${deviceIP} Timer triggered`);
 		polling[deviceIP] = setTimeout(() => {
+			this.log.debug(`${deviceIP} Timer executed`);
 			this.getDeviceData(deviceIP);
 		}, activeDevices[deviceIP].basicInfo.interval * 1000);
 	}
@@ -237,16 +245,24 @@ class WlanthermoNano extends utils.Adapter {
 			// Get Device Settings
 			const response_settings = await axios(url + '/settings', { timeout: 5000 });
 			if (response_settings == null || response_settings.data == null) return;
+			this.log.debug(`${ip} data | ${JSON.stringify(response_settings.data)}`);
 			const responseData: DeviceSettings = response_settings.data;
 			// Store all data into memory
 			activeDevices[device.ip].deviceURL = url;
 			activeDevices[device.ip].settings = responseData;
 			activeDevices[device.ip].initialised = true;
 
+			this.log.debug(`${ip} memory cache | ${JSON.stringify(activeDevices[device.ip])}`);
+
 			// Create channels
 			await this.deviceStructures(activeDevices[device.ip].settings.device.serial, device.ip);
 			// Create States for device settings
 			for (const i in response_settings.data.device) {
+				this.log.debug(
+					`Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${
+						response_settings.data.device[i]
+					}`,
+				);
 				await this.setObjectAndState(
 					`${activeDevices[device.ip].settings.device.serial}.Info`,
 					`${i}`,
@@ -258,7 +274,7 @@ class WlanthermoNano extends utils.Adapter {
 			);
 			this.getDeviceData(ip);
 		} catch (e) {
-			console.error(e);
+			this.log.debug(`[initialiseDevice] ${e}`);
 			if (initializing) {
 				this.log.warn(`${ip} Connection failed, will try again later ${e}`);
 			}
@@ -273,10 +289,12 @@ class WlanthermoNano extends utils.Adapter {
 			});
 
 			for (const object in BasicStates) {
+				this.log.debug(`Create basic state ${serial}.${object}`);
 				await this.setObjectAndState(`${serial}`, `${object}`, null);
 			}
 		} catch (e) {
-			console.error(e);
+			this.log.error(`[deviceStructures] ${e}`);
+			this.sendSentry(`[deviceStructures] ${e}`);
 		}
 	}
 
@@ -306,7 +324,8 @@ class WlanthermoNano extends utils.Adapter {
 				});
 			}
 		} catch (e) {
-			console.error(e);
+			this.log.error(`[setObjectAndState] ${e}`);
+			this.sendSentry(`[setObjectAndState] ${e}`);
 		}
 	}
 
@@ -331,6 +350,8 @@ class WlanthermoNano extends utils.Adapter {
 
 			callback();
 		} catch (e) {
+			this.log.error(`[onUnload] ${e}`);
+			this.sendSentry(`[onUnload] ${e}`);
 			callback();
 		}
 	}
@@ -339,12 +360,26 @@ class WlanthermoNano extends utils.Adapter {
 	 * Is called if a subscribed state changes
 	 */
 	private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
-		if (state) {
-			// The state was changed
-			// this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-		} else {
-			// The state was deleted
-			this.log.info(`state ${id} deleted`);
+		try {
+			if (state) {
+				// The state was changed
+				// this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+			} else {
+				// The state was deleted
+				// this.log.info(`state ${id} deleted`);
+			}
+		} catch (e) {
+			this.log.error(`[onStateChange] ${e}`);
+			this.sendSentry(`[onStateChange] ${e}`);
+		}
+	}
+
+	private sendSentry(error: string): void {
+		if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
+			const sentryInstance = this.getPluginInstance('sentry');
+			if (sentryInstance) {
+				sentryInstance.getSentryObject().captureException(error);
+			}
 		}
 	}
 }
