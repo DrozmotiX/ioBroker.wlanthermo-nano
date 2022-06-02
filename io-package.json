@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "wlanthermo-nano",
-		"version": "0.1.2",
+		"version": "0.0.1",
 		"news": {
 			"0.1.2": {
 				"en": "Support multiple devices",
@@ -77,51 +77,75 @@
 			"pl": "WLANThermo Nano, cyfrowa zaleta dla Twojego grilla",
 			"zh-cn": "WLANThermo Nano，为您的烧烤运动提供数字优势"
 		},
-		"authors": [
-			"DutchmanNL <rdrozda86@gmail.com>"
-		],
+		"authors": ["DutchmanNL <oss@DrozmotiX.eu>"],
+		"keywords": ["iobroker-adapter"],
 		"contributors": [
 			"Jey-Cee"
 		  ],
-		"keywords": [
 			"WLANThermo",
 			"barbecue",
 			"sensor"
 		],
 		"license": "MIT",
 		"platform": "Javascript/Node.js",
-		"main": "main.js",
+		"main": "build/main.js",
 		"icon": "wlanthermo-nano.png",
 		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/master/admin/wlanthermo-nano.png",
-		"readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/master/README.md",
+		"extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/main/admin/wlanthermo-nano.png",
+		"readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/main/README.md",
 		"loglevel": "info",
 		"mode": "daemon",
 		"type": "household",
 		"compact": true,
+		"connectionType": "local",
+		"dataSource": "poll",
 		"materialize": true,
+		"adminUI": {
+			"config": "json"
+		},
 		"plugins": {
 			"sentry": {
-				"dsn": "https://a1dee206514f444d843940f8b443d47d@sentry.iobroker.net/26"
+				"dsn": "https://7c3dff9381a44d32b1b94e5bc827b09d@sentry.drozmotix.eu/3"
 			}
 		},
+		"eraseOnUpload": true,
 		"dependencies": [
 			{
-				"js-controller": ">=1.4.2"
+				"js-controller": ">=4.0.0"
 			}
 		]
 	},
+	"encryptedNative": [
+		"password"
+	],
 	"native": {
-		"devices": [
-			{
-			  "username": "admin",
-			  "password": "admin",
-			  "ip": "192.168.xxx.xxx",
-			  "port": "80"
-			}
-		  ],
-		  "intervallTime": 10
-		},
+		"username": "admin",
+		"password": "admin",
+		"interval": 30,
+		"ip": "192.168.xxx.xxx"
+	},
 	"objects": [],
-	"instanceObjects": []
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		}
+	]
 }

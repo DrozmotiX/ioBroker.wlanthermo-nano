@@ -1,0 +1,49 @@
+{
+  "type": "panel",
+  "i18n": true,
+  "items": {
+    "_basicSettings": {
+      "newLine": true,
+      "type": "header",
+      "text": "Please provide your credentials",
+      "sm": 12,
+      "size": 8
+    },
+    "username": {
+      "newLine": true,
+      "type": "text",
+      "label": "Username",
+      "sm": 3
+    },
+    "password": {
+      "repeat": false,
+      "visible": false,
+      "sm": 3,
+      "type": "password",
+      "label": "Password"
+    },
+    "ip": {
+      "sm": 3,
+      "type": "ip",
+      "label": "Ip address of device"
+    },
+    "interval": {
+      "sm": 2,
+      "type": "number",
+      "label": "Interval in seconds",
+      "min" : 10,
+      "max" : 300,
+      "step": 5
+    },
+    "deviceList": {
+      "sm": 12,
+      "type": "table",
+      "items": [
+        {"type": "text", "width": 2, "title": {"en": "ip-address"}, "attr": "ip", "filter": false, "sort": true, "default": ""},
+        {"type": "text", "width": 2, "title": {"en": "username"}, "attr": "username", "filter": false, "sort": true, "default": ""},
+        {"type": "password", "repeat": false, "width": 2, "title": {"en": "password"}, "attr": "password", "filter": false, "sort": true, "default": ""},
+        {"type": "number", "width": 2, "title": {"en": "interval in seconds"}, "attr": "interval", "filter": false, "sort": true, "default": 30}
+      ]
+    }
+  }
+}
