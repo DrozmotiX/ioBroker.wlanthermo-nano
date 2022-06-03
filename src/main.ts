@@ -351,10 +351,12 @@ class WlanthermoNano extends utils.Adapter {
 					clearTimeout(polling[device]);
 					polling[device] = {};
 				}
-				this.setState(`${activeDevices[device].settings.device.serial}.Info.connected`, {
-					val: false,
-					ack: true,
-				});
+				if (`${activeDevices[device]}` != null && `${activeDevices[device].settings}` != null) {
+					this.setState(`${activeDevices[device].settings.device.serial}.Info.connected`, {
+						val: false,
+						ack: true,
+					});
+				}
 			}
 
 			callback();
