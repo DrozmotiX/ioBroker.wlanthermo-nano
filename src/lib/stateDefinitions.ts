@@ -50,6 +50,26 @@ const stateAttrb: StateAttr = {
 		role: 'level.color.rgb',
 		write: true,
 	},
+	cpu: {
+		type: 'mixed',
+		role: 'value',
+	},
+	flash_size: {
+		type: 'number',
+		role: 'value',
+	},
+	prerelease: {
+		type: 'mixed',
+		role: 'value',
+	},
+	fixed: {
+		type: 'mixed',
+		role: 'value',
+	},
+	typ_last: {
+		type: 'mixed',
+		role: 'value',
+	},
 	connected: {
 		type: 'boolean',
 		role: 'info.connected',
@@ -141,7 +161,7 @@ const stateAttrb: StateAttr = {
 	set: {
 		type: 'number',
 		role: 'value',
-		unit: 'unit_device',
+		unit: 'C',
 		write: true,
 	},
 	set_color: {

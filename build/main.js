@@ -305,7 +305,7 @@ class WlanthermoNano extends utils.Adapter {
     try {
       if (state) {
         this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        if (!state.ack) {
+        if (!state.ack && state.val != null) {
           this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
           const deviceId = id.split(".");
           const deviceIP = ipSerialMapping[deviceId[2]].ip;
@@ -316,18 +316,18 @@ class WlanthermoNano extends utils.Adapter {
               const post_url = `${url}/restart`;
               const response = await import_axios.default.post(post_url);
               this.setState(`${id}`, { val: false, ack: true });
-              this.log.info(`${deviceIP} restart requested ${response.status}`);
+              this.log.info(`${deviceIP} Restart requested ${response.status}`);
               activeDevices[deviceIP].initialised = false;
             } else if (deviceId[4] === "checkupdate") {
               const post_url = `${url}/checkupdate`;
               const response = await import_axios.default.post(post_url);
               this.setState(`${id}`, { val: false, ack: true });
-              this.log.info(`${deviceIP} check for updates ${response.status}`);
+              this.log.info(`${deviceIP} Check for updates ${response.status}`);
             } else if (deviceId[4] === "update") {
               const post_url = `${url}/update`;
               const response = await import_axios.default.post(post_url);
               this.setState(`${id}`, { val: false, ack: true });
-              this.log.info(`${deviceIP} device update requested ${response.status}`);
+              this.log.info(`${deviceIP} Device update requested ${response.status}`);
             } else {
             }
           } else if (deviceId[3] === "Sensors") {
@@ -362,7 +362,7 @@ class WlanthermoNano extends utils.Adapter {
   }
   async sendArray(url, array, type) {
     try {
-      this.log.debug(`Send config change ${JSON.stringify(array)}`);
+      this.log.debug(`Send array ${type} ${JSON.stringify(array)}`);
       if (url == null)
         return;
       const post_url = `${url}${type}`;

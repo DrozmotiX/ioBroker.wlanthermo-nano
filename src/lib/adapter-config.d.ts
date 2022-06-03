@@ -49,7 +49,7 @@ declare global {
 			prerelease: boolean;
 			crashreport: boolean;
 			hwversion: string;
-		};
+		}[string];
 		hardware: ['V1'];
 		api: {
 			version: string;
@@ -93,36 +93,33 @@ declare global {
 			unit: string;
 			rssi: number;
 			online: number;
-		};
-		channel: [
-			{
-				number: number;
-				name: string;
-				typ: number;
-				temp: number;
-				min: number;
-				max: number;
-				alarm: number;
-				color: string;
-				fixed: boolean;
-				connected: boolean;
-			},
-		];
+		}[string];
+		channel: {
+			number: number;
+			name: string;
+			typ: number;
+			temp: number;
+			min: number;
+			max: number;
+			alarm: number;
+			color: string;
+			fixed: boolean;
+			connected: boolean;
+		}[string];
+
 		pitmaster: {
-			type: ['off', 'manual', 'auto'];
-			pm: [
-				{
-					id: number;
-					channel: number;
-					pid: number;
-					value: number;
-					set: number;
-					typ: string;
-					typ_last: string;
-					set_color: string;
-					value_color: string;
-				},
-			];
+			type: string;
+			pm: {
+				id: number;
+				channel: number;
+				pid: number;
+				value: number;
+				set: number;
+				typ: string;
+				typ_last: string;
+				set_color: string;
+				value_color: string;
+			}[string];
 		};
 	};
 

@@ -41,7 +41,7 @@ class WlanthermoNano extends utils.Adapter {
 		let amountConnected = 0;
 		for (const device in devices) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
+			//@ts-expect-error <Array Preparation, not all attributes present yet>
 			activeDevices[devices[device].ip] = {};
 			activeDevices[devices[device].ip].basicInfo = devices[device];
 			activeDevices[devices[device].ip].initialised = false;
@@ -76,8 +76,6 @@ class WlanthermoNano extends utils.Adapter {
 
 				// Write states for configuration channel
 				for (const i in activeDevices[deviceIP].data.system) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
 					const value = activeDevices[deviceIP].data.system[i];
 					this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
 					await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
@@ -163,8 +161,6 @@ class WlanthermoNano extends utils.Adapter {
 								break;
 
 							default:
-								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-								// @ts-ignore
 								await this.setObjectAndState(`${sensorRoot}`, `${y}`, channel[i][y]);
 								this.subscribeStates(`${sensorRoot}.${y}`);
 						}
@@ -198,8 +194,6 @@ class WlanthermoNano extends utils.Adapter {
 						} else if (y === 'value_color') {
 							// ignore set_color
 						} else {
-							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-							// @ts-ignore
 							await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
 						}
 					}
@@ -376,7 +370,7 @@ class WlanthermoNano extends utils.Adapter {
 				// The state was changed
 				this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
 				//Only fire when ack = false (set by admin or script)
-				if (!state.ack) {
+				if (!state.ack && state.val != null) {
 					this.log.debug(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
 					const deviceId = id.split('.');
 
@@ -389,18 +383,18 @@ class WlanthermoNano extends utils.Adapter {
 							const post_url = `${url}/restart`;
 							const response = await axios.post(post_url);
 							this.setState(`${id}`, { val: false, ack: true });
-							this.log.info(`${deviceIP} restart requested ${response.status}`);
+							this.log.info(`${deviceIP} Restart requested ${response.status}`);
 							activeDevices[deviceIP].initialised = false;
 						} else if (deviceId[4] === 'checkupdate') {
 							const post_url = `${url}/checkupdate`;
 							const response = await axios.post(post_url);
 							this.setState(`${id}`, { val: false, ack: true });
-							this.log.info(`${deviceIP} check for updates ${response.status}`);
+							this.log.info(`${deviceIP} Check for updates ${response.status}`);
 						} else if (deviceId[4] === 'update') {
 							const post_url = `${url}/update`;
 							const response = await axios.post(post_url);
 							this.setState(`${id}`, { val: false, ack: true });
-							this.log.info(`${deviceIP} device update requested ${response.status}`);
+							this.log.info(`${deviceIP} Device update requested ${response.status}`);
 						} else {
 							/**
 
@@ -428,8 +422,7 @@ class WlanthermoNano extends utils.Adapter {
 					} else if (deviceId[3] === 'Sensors') {
 						// Update value of state change to memory
 						const sensorID = parseInt(deviceId[4].replace('Sensor_', '')) - 1;
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
+
 						activeDevices[deviceIP].data.channel[sensorID][deviceId[5]] = state.val;
 						// Prepare configuration data as array
 						const array = {
@@ -492,7 +485,7 @@ class WlanthermoNano extends utils.Adapter {
 
 	private async sendArray(url: string | undefined, array: object, type: string): Promise<any> {
 		try {
-			this.log.debug(`Send config change ${JSON.stringify(array)}`);
+			this.log.debug(`Send array ${type} ${JSON.stringify(array)}`);
 			if (url == null) return;
 			const post_url = `${url}${type}`;
 			const respons = axios.post(post_url, array);
