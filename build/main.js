@@ -329,6 +329,19 @@ class WlanthermoNano extends utils.Adapter {
               this.setState(`${id}`, { val: false, ack: true });
               this.log.info(`${deviceIP} Device update requested ${response.status}`);
             } else {
+              this.log.info(`${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
+              activeDevices[deviceIP].settings.system[deviceId[5]] = state.val;
+              const array = {
+                ap: activeDevices[deviceIP].settings.system.ap,
+                host: activeDevices[deviceIP].settings.system.host,
+                language: activeDevices[deviceIP].settings.system.language,
+                unit: activeDevices[deviceIP].settings.system.unit,
+                autoupd: activeDevices[deviceIP].settings.system.autoupd,
+                hwversion: activeDevices[deviceIP].settings.system.hwversion
+              };
+              this.sendArray(url, array, "/setsystem");
+              activeDevices[deviceIP].initialised = false;
+              await this.getDeviceData(deviceIP);
             }
           } else if (deviceId[3] === "Sensors") {
             const sensorID = parseInt(deviceId[4].replace("Sensor_", "")) - 1;
@@ -345,8 +358,27 @@ class WlanthermoNano extends utils.Adapter {
             this.log.info(`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
             await this.sendArray(url, array, "/setchannels");
             await this.getDeviceData(deviceIP);
-          } else {
+          } else if (deviceId[3] === "Pitmaster") {
             try {
+              this.log.info(`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
+              const pitmasterID = parseInt(deviceId[4].replace("Pitmaster_", "")) - 1;
+              if ([deviceId[5]].toString() !== "modus") {
+                activeDevices[deviceIP].data.pitmaster.pm[pitmasterID][deviceId[5]] = state.val;
+              } else {
+                activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ = state.val.toString();
+              }
+              const array = [
+                {
+                  id: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].id,
+                  channel: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].channel,
+                  pid: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].pid,
+                  value: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].value,
+                  set: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].set,
+                  typ: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ
+                }
+              ];
+              this.sendArray(url, array, "/setpitmaster");
+              await this.getDeviceData(deviceIP);
             } catch (e) {
               this.log.error("Error in handling pitmaster state change" + e);
             }

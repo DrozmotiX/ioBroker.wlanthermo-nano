@@ -396,26 +396,22 @@ class WlanthermoNano extends utils.Adapter {
 							this.setState(`${id}`, { val: false, ack: true });
 							this.log.info(`${deviceIP} Device update requested ${response.status}`);
 						} else {
-							/**
-
-							 // ToDo: Define logic for config changes
-							this.log.debug('Change in configuration settings');
-							// ToDo: Update value of state change to memory
-							// const array = {
-							// 	ap: activeDevices['ip'].settings.system.ap,
-							// 	host: activeDevices['ip'].settings.system.host,
-							// 	language: activeDevices['ip'].settings.system.language,
-							// 	unit: activeDevices['ip'].settings.system.unit,
-							// 	// 'hwalarm': false,
-							// 	// 'fastmode': false,
-							// 	autoupd: activeDevices['ip'].settings.system.autoupd,
-							// 	hwversion: activeDevices['ip'].settings.system.hwversion,
-							// };
-
-							//ToDo: Add case routine to only send relevant post request
-							// this.log.debug(JSON.stringify(array));
-							// this.sendArray(array, '/setsystem');
-							 */
+							this.log.info(
+								`${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
+							);
+							activeDevices[deviceIP].settings.system[deviceId[5]] = state.val;
+							const array = {
+								ap: activeDevices[deviceIP].settings.system.ap,
+								host: activeDevices[deviceIP].settings.system.host,
+								language: activeDevices[deviceIP].settings.system.language,
+								unit: activeDevices[deviceIP].settings.system.unit,
+								autoupd: activeDevices[deviceIP].settings.system.autoupd,
+								hwversion: activeDevices[deviceIP].settings.system.hwversion,
+							};
+							this.sendArray(url, array, '/setsystem');
+							// Refresh states
+							activeDevices[deviceIP].initialised = false;
+							await this.getDeviceData(deviceIP);
 						}
 
 						// Handle Post command for sensor related settings
@@ -442,32 +438,31 @@ class WlanthermoNano extends utils.Adapter {
 						await this.sendArray(url, array, '/setchannels');
 						// Refresh states
 						await this.getDeviceData(deviceIP);
-					} else {
+					} else if (deviceId[3] === 'Pitmaster') {
 						try {
-							/**
-
-							// ToDo: build logic for pidmaster changes
-							this.log.debug(
-								`Change in Pidmaster settings ${id} | ${state.val}`
+							this.log.info(
+								`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
 							);
+							const pitmasterID = parseInt(deviceId[4].replace('Pitmaster_', '')) - 1;
 
-							const modus = await this.getStateAsync(
-								deviceId[2] + '.' + deviceId[3] + '.' + deviceId[4] + '.' + 'modus',
-							);
+							if ([deviceId[5]].toString() !== 'modus') {
+								activeDevices[deviceIP].data.pitmaster.pm[pitmasterID][deviceId[5]] = state.val;
+							} else {
+								activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ = state.val.toString();
+							}
 							const array = [
 								{
-									id: activeDevices[deviceIP].data.pitmaster[0].id,
-									channel: activeDevices[deviceIP].data.pitmaster[0].channel,
-									pid: activeDevices[deviceIP].data.pitmaster[0].pid,
-									value: activeDevices[deviceIP].data.pitmaster[0].value,
-									set: activeDevices[deviceIP].data.pitmaster[0].set,
-									typ: activeDevices[deviceIP].data.pitmaster[0].type,
+									id: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].id,
+									channel: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].channel,
+									pid: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].pid,
+									value: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].value,
+									set: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].set,
+									typ: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ,
 								},
 							];
-
-							this.log.debug(JSON.stringify(array));
-							this.sendArray(array, '/setpitmaster');
-							 */
+							this.sendArray(url, array, '/setpitmaster');
+							// Refresh states
+							await this.getDeviceData(deviceIP);
 						} catch (e) {
 							this.log.error('Error in handling pitmaster state change' + e);
 						}

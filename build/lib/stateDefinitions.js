@@ -51,6 +51,26 @@ const stateAttrb = {
     role: "level.color.rgb",
     write: true
   },
+  cpu: {
+    type: "mixed",
+    role: "value"
+  },
+  flash_size: {
+    type: "number",
+    role: "value"
+  },
+  prerelease: {
+    type: "mixed",
+    role: "value"
+  },
+  fixed: {
+    type: "mixed",
+    role: "value"
+  },
+  typ_last: {
+    type: "mixed",
+    role: "value"
+  },
   connected: {
     type: "boolean",
     role: "info.connected"
@@ -105,8 +125,8 @@ const stateAttrb = {
     write: true
   },
   modus: {
-    def: 0,
-    type: "number",
+    def: "off",
+    type: "string",
     role: "switch.mode",
     write: true,
     states: {
@@ -142,7 +162,7 @@ const stateAttrb = {
   set: {
     type: "number",
     role: "value",
-    unit: "unit_device",
+    unit: "C",
     write: true
   },
   set_color: {
@@ -286,6 +306,9 @@ function buildCommon(stateName) {
     obj.common.type = stateAttrb[stateName].type;
     if (stateAttrb[stateName].write != null) {
       obj.common.write = stateAttrb[stateName].write;
+    }
+    if (stateAttrb[stateName].states != null) {
+      obj.common.states = stateAttrb[stateName].states;
     }
   }
   return obj;

@@ -3,7 +3,7 @@ type StateAttr = {
 	[key: string]: {
 		def?: boolean | string | number | null;
 		name?: string;
-		states?: object;
+		states?: string | Record<string, string> | string[];
 		type: ioBroker.CommonType;
 		role: string;
 		/** Unit of the state */
@@ -124,8 +124,8 @@ const stateAttrb: StateAttr = {
 		write: true,
 	},
 	modus: {
-		def: 0,
-		type: 'number',
+		def: 'off',
+		type: 'string',
 		role: 'switch.mode',
 		write: true,
 		states: {
@@ -310,6 +310,10 @@ function buildCommon(stateName: string): MyObjectsDefinitions {
 
 		if (stateAttrb[stateName].write != null) {
 			obj.common.write = stateAttrb[stateName].write;
+		}
+
+		if (stateAttrb[stateName].states != null) {
+			obj.common.states = stateAttrb[stateName].states;
 		}
 	}
 	return obj;
