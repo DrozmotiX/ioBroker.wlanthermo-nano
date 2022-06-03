@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "wlanthermo-nano",
-    "version": "0.2.0-beta.0",
+    "version": "0.2.0-beta.1",
     "news": {
+      "0.2.0-beta.1": {
+        "en": "Refactor code\nAllow control of pitmaster & system settings",
+        "de": "Refactor-Code\nErmöglicht die Steuerung von Pitmaster- und Systemeinstellungen",
+        "ru": "Код рефакторинга\nРазрешить управление pitmaster и системными настройками",
+        "pt": "Refatorar código\nPermitir o controle das configurações do pitmaster e do sistema",
+        "nl": "Refactorcode\nControle over pitmaster- en systeeminstellingen toestaan",
+        "fr": "Refactoriser le code\nAutoriser le contrôle des paramètres du pitmaster et du système",
+        "it": "Codice di refactoring\nConsenti il controllo del pitmaster e delle impostazioni di sistema",
+        "es": "Código de refactorización\nPermitir el control de pitmaster y la configuración del sistema",
+        "pl": "Kod refaktoryzacji\nZezwalaj na kontrolę nad pitmasterem i ustawieniami systemu",
+        "zh-cn": "重构代码\n允许控制pitmaster和系统设置"
+      },
       "0.2.0-beta.0": {
         "en": "Support multiple devices\nError/debug logging Improved\nAdapter rebuild to TypeScript\nTest & Release workflow updated\nAdded indicator for connection status\nReconnecting to offline devices improved\nEnsure support of all WLANThermo-Nano Devices",
         "de": "Unterstützt mehrere Geräte\nFehler-/Debug-Protokollierung Verbessert\nUmbau des Adapters auf TypeScript\nTest- und Release-Workflow aktualisiert\nIndikator für den Verbindungsstatus hinzugefügt\nWiederverbinden mit Offline-Geräten verbessert\nStellen Sie sicher, dass alle WLANThermo-Nano-Geräte unterstützt werden",

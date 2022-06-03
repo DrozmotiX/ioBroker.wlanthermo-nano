@@ -36,6 +36,10 @@ If you like my work, please feel free to provide a personal donation
 
 
 ## Changelog
+### 0.2.0-beta.1 (2022-06-03)
+* (DutchmanNL) Refactor code
+* (DutchmanNL) Allow control of pitmaster & system settings
+
 ### 0.2.0-beta.0 (2022-06-02) - Adapter rebuild to TypeScript
 * (DutchmanNL) Support multiple devices
 * (DutchmanNL) Error/debug logging Improved
