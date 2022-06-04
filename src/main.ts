@@ -75,16 +75,15 @@ class WlanthermoNano extends utils.Adapter {
 				const serial: string = activeDevices[deviceIP].settings.device.serial;
 
 				// Write states for configuration channel
-				for (const i in activeDevices[deviceIP].data.system) {
-					const value = activeDevices[deviceIP].data.system[i];
-					this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
-					await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
+				for (const [key, value] of Object.entries(activeDevices[deviceIP].data.system)) {
+					this.log.debug(`Create configuration state ${serial}.Configuration.${key} | ${value}`);
+					await this.setObjectAndState(`${serial}.Configuration`, `${key}`, value);
 				}
 
 				// Read all sensor related settings and write to states
 				const channel = activeDevices[deviceIP].data.channel;
-				for (const i in channel) {
-					const sensorRoot = `${serial}.Sensors.Sensor_${1 + parseInt(i)}`;
+				for (let i = 0; i < channel.length; i++) {
+					const sensorRoot = `${serial}.Sensors.Sensor_${1 + +i}`;
 					this.log.debug(`Create sensor states ${sensorRoot}`);
 					await this.setObjectNotExistsAsync(sensorRoot, {
 						type: 'channel',
@@ -101,13 +100,13 @@ class WlanthermoNano extends utils.Adapter {
 					}
 
 					//  Write states for temperature sensors
-					for (const y in channel[i]) {
-						switch (y) {
+					for (const [key, value] of Object.entries(channel[i])) {
+						switch (key) {
 							case 'typ':
-								await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+								await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
 									type: 'state',
 									common: {
-										name: y,
+										name: key,
 										role: 'switch.mode',
 										read: true,
 										type: 'number',
@@ -118,16 +117,16 @@ class WlanthermoNano extends utils.Adapter {
 									native: {},
 								});
 
-								this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
-								this.subscribeStates(`${sensorRoot}.${y}`);
+								this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
+								this.subscribeStates(`${sensorRoot}.${key}`);
 
 								break;
 
 							case 'alarm':
-								await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+								await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
 									type: 'state',
 									common: {
-										name: y,
+										name: key,
 										role: 'indicator.alarm',
 										read: true,
 										type: 'number',
@@ -142,66 +141,66 @@ class WlanthermoNano extends utils.Adapter {
 									},
 									native: {},
 								});
-								this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
-								this.subscribeStates(`${sensorRoot}.${y}`);
+								this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
+								this.subscribeStates(`${sensorRoot}.${key}`);
 
 								break;
 
 							case 'temp':
-								await this.setObjectAndState(`${sensorRoot}`, `${y}`, null);
-								if (channel[i][y] !== 999) {
-									this.setState(`${sensorRoot}.${y}`, {
-										val: channel[i][y],
+								await this.setObjectAndState(`${sensorRoot}`, `${key}`, null);
+								if (channel[i][key] !== 999) {
+									this.setState(`${sensorRoot}.${key}`, {
+										val: channel[i][key],
 										ack: true,
 										expire: activeDevices[deviceIP].basicInfo.interval * 2000,
 									});
 								} else {
-									this.setState(`${sensorRoot}.${y}`, { val: null, ack: true });
+									this.setState(`${sensorRoot}.${key}`, { val: null, ack: true });
 								}
 								break;
 
 							default:
-								await this.setObjectAndState(`${sensorRoot}`, `${y}`, channel[i][y]);
-								this.subscribeStates(`${sensorRoot}.${y}`);
+								await this.setObjectAndState(`${sensorRoot}`, `${key}`, value);
+								this.subscribeStates(`${sensorRoot}.${key}`);
 						}
 					}
-				}
 
-				//  Write states for pitmaster
-				const pitmaster = activeDevices[deviceIP].data.pitmaster;
-				for (const i in pitmaster.pm) {
-					const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + parseInt(i)}`;
-					this.log.debug(`Create Pitmaster states ${stateRoot}`);
-					await this.setObjectNotExistsAsync(stateRoot, {
-						type: 'channel',
-						common: {
-							name: 'Pitmaster',
-						},
-						native: {},
+					//  Write states for pitmaster
+					const pitmaster = activeDevices[deviceIP].data.pitmaster;
+					for (let i = 0; i < pitmaster.pm.length; i++) {
+						const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + i}`;
+						this.log.debug(`Create Pitmaster states ${stateRoot}`);
+						await this.setObjectNotExistsAsync(stateRoot, {
+							type: 'channel',
+							common: {
+								name: 'Pitmaster',
+							},
+							native: {},
+						});
+
+						for (const [key, value] of Object.entries(pitmaster.pm[i])) {
+							if (key === 'typ') {
+								await this.setObjectAndState(`${stateRoot}`, `modus`, value);
+								// Subscribe on state
+								// this.subscribeStates(`${stateRoot}.modus`);
+							} else if (key === 'pid') {
+								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
+								// Subscribe on state
+								// this.subscribeStates(`${stateRoot}.${y}`);
+							} else if (key === 'set_color') {
+								// ignore set_color
+							} else if (key === 'value_color') {
+								// ignore set_color
+							} else {
+								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
+							}
+						}
+					}
+					this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
+						val: true,
+						ack: true,
 					});
-
-					for (const y in pitmaster.pm[i]) {
-						if (y === 'typ') {
-							await this.setObjectAndState(`${stateRoot}`, `modus`, pitmaster.pm[i][y]);
-							// Subscribe on state
-							// this.subscribeStates(`${stateRoot}.modus`);
-						} else if (y === 'pid') {
-							await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
-							// Subscribe on state
-							// this.subscribeStates(`${stateRoot}.${y}`);
-						} else if (y === 'set_color') {
-							// ignore set_color
-						} else if (y === 'value_color') {
-							// ignore set_color
-						} else {
-							await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
-						}
-					}
 				}
-				this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
-					val: true,
-					ack: true,
-				});
 			}
 		} catch (e) {
 			this.log.debug(`[getDeviceData] ${e}`);
