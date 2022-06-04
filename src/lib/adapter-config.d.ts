@@ -93,42 +93,33 @@ declare global {
 			unit: string;
 			rssi: number;
 			online: number;
-		}[string];
-		channel: [
-			{
-				number: number;
-				name: string;
-				typ: number;
-				temp: number;
-				min: number;
-				max: number;
-				alarm: number;
-				color: string;
-				fixed: boolean;
-				connected: boolean;
-			},
-		];
-
+		}[];
+		channel: {
+			number: number;
+			name: string;
+			typ: number;
+			temp: number;
+			min: number;
+			max: number;
+			alarm: number;
+			color: string;
+			fixed: boolean;
+			connected: boolean;
+		}[];
 		pitmaster: {
 			type: string;
-			pm: [
-				{
-					id: number;
-					channel: number;
-					pid: number;
-					value: number;
-					set: number;
-					typ: string;
-					typ_last: string;
-					set_color: string;
-					value_color: string;
-				},
-			];
+			pm: {
+				id: number;
+				channel: number;
+				pid: number;
+				value: number;
+				set: number;
+				typ: string;
+				typ_last: string;
+				set_color: string;
+				value_color: string;
+			}[];
 		};
-	};
-
-	type Polling = {
-		[key: string]: object;
 	};
 
 	type activeDevices = {

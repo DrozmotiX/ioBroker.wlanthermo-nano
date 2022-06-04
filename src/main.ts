@@ -418,7 +418,7 @@ class WlanthermoNano extends utils.Adapter {
 						// Update value of state change to memory
 						const sensorID = parseInt(deviceId[4].replace('Sensor_', '')) - 1;
 
-						activeDevices[deviceIP].data.channel[sensorID][deviceId[5]] = state.val;
+						(activeDevices[deviceIP].data.channel[sensorID] as any)[deviceId[5]] = state.val;
 						// Prepare configuration data as array
 						const array = {
 							number: activeDevices[deviceIP].data.channel[sensorID].number,
@@ -445,7 +445,8 @@ class WlanthermoNano extends utils.Adapter {
 							const pitmasterID = parseInt(deviceId[4].replace('Pitmaster_', '')) - 1;
 
 							if ([deviceId[5]].toString() !== 'modus') {
-								activeDevices[deviceIP].data.pitmaster.pm[pitmasterID][deviceId[5]] = state.val;
+								(activeDevices[deviceIP].data.pitmaster.pm[pitmasterID] as any)[deviceId[5]] =
+									state.val;
 							} else {
 								activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ = state.val.toString();
 							}
