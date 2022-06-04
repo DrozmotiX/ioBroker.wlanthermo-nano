@@ -212,6 +212,68 @@ const stateAttrb = {
   version: {
     type: "mixed",
     role: "info.version"
+  },
+  aktor: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  Kp: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  Ki: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  Kd: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  DCmmin: {
+    unit: "%",
+    type: "number",
+    def: 0,
+    write: true
+  },
+  DCmmax: {
+    unit: "%",
+    type: "number",
+    def: 0,
+    write: true
+  },
+  opl: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  SPmin: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  SPmax: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  link: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  tune: {
+    type: "number",
+    def: 0,
+    write: true
+  },
+  jp: {
+    type: "number",
+    def: 0,
+    write: true
   }
 };
 const BasicStates = {

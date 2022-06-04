@@ -36,9 +36,9 @@ If you like my work, please feel free to provide a personal donation
 
 ## Changelog
 * (DutchmanNL) Refactor code
-* (DutchmanNL) Add states for features
-* (DutchmanNL) Add states for PID profiles
+* (DutchmanNL) Added datapoints for features
 * (DutchmanNL) Allow alarm to be activated / disabled #6
+* (DutchmanNL) Added datapoints for PID profiles including capability to change profile settings
 * (DutchmanNL) Implemented dropdown menu for Pitmaster to select available profiles
 
 ### 0.2.0-beta.1 (2022-06-03)

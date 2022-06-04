@@ -358,7 +358,7 @@ class WlanthermoNano extends utils.Adapter {
 		try {
 			// Clear running timer
 			for (const device in activeDevices) {
-				if (polling[device]) {
+				if (polling != null && polling[device] != null) {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					clearTimeout(polling[device]);
@@ -375,7 +375,7 @@ class WlanthermoNano extends utils.Adapter {
 			callback();
 		} catch (e) {
 			this.log.error(`[onUnload] ${e}`);
-			this.sendSentry(`[onUnload] ${e}`);
+			this.sendSentry(`[onUnload] ${e} | DeviceMemory ${activeDevices}`);
 			callback();
 		}
 	}
@@ -402,7 +402,7 @@ class WlanthermoNano extends utils.Adapter {
 							const post_url = `${url}/restart`;
 							const response = await axios.post(post_url);
 							this.setState(`${id}`, { val: false, ack: true });
-							this.log.info(`${deviceIP} Restart requested ${response.status}`);
+							this.log.info(`${deviceIP} Restart requested ${response.status}, reconnecting device`);
 							activeDevices[deviceIP].initialised = false;
 						} else if (deviceId[4] === 'checkupdate') {
 							const post_url = `${url}/checkupdate`;
@@ -416,7 +416,7 @@ class WlanthermoNano extends utils.Adapter {
 							this.log.info(`${deviceIP} Device update requested ${response.status}`);
 						} else {
 							this.log.info(
-								`${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
+								`${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}, reconnecting device`,
 							);
 							activeDevices[deviceIP].settings.system[deviceId[5]] = state.val;
 							const array = {
@@ -450,20 +450,36 @@ class WlanthermoNano extends utils.Adapter {
 						await this.getDeviceData(deviceIP);
 					} else if (deviceId[3] === 'Pitmaster') {
 						try {
-							this.log.info(
-								`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
-							);
-							const pitmasterID = parseInt(deviceId[4].replace('Pitmaster_', '')) - 1;
-							const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
+							if ([deviceId[4]].toString() === 'Profiles') {
+								// Changing profile ID is not allowed
+								if (deviceId[6].toString() === 'id') return;
+								const profileID = parseInt(deviceId[5].replace('Profile_', '')) - 1;
+								const currentProfiles = activeDevices[deviceIP].settings.pid;
+								(currentProfiles as any)[profileID][deviceId[6]] = state.val;
 
-							if ([deviceId[5]].toString() !== 'modus') {
-								(currentPM as any)[deviceId[5]] = state.val;
+								this.sendArray(url, currentProfiles, '/setpid');
+								this.log.info(
+									`${deviceIP} Pitmaster profile ${profileID} changed ${deviceId[6]} | ${state.val}, reconnecting device`,
+								);
+								// Refresh states
+								activeDevices[deviceIP].initialised = false;
+								await this.getDeviceData(deviceIP);
 							} else {
-								currentPM.typ = state.val.toString();
+								const pitmasterID = parseInt(deviceId[4].replace('Pitmaster_', '')) - 1;
+								this.log.info(
+									`${deviceIP} Pitmaster ${pitmasterID} configuration changed ${deviceId[5]} | ${state.val}`,
+								);
+								const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
+
+								if ([deviceId[5]].toString() !== 'modus') {
+									(currentPM as any)[deviceId[5]] = state.val;
+								} else {
+									currentPM.typ = state.val.toString();
+								}
+								this.sendArray(url, activeDevices[deviceIP].data.pitmaster.pm, '/setpitmaster');
+								// Refresh states
+								await this.getDeviceData(deviceIP);
 							}
-							this.sendArray(url, activeDevices[deviceIP].data.pitmaster.pm, '/setpitmaster');
-							// Refresh states
-							await this.getDeviceData(deviceIP);
 						} catch (e) {
 							this.log.error('Error in handling pitmaster state change' + e);
 						}
