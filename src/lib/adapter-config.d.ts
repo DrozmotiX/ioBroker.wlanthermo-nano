@@ -63,7 +63,22 @@ declare global {
 			bluetooth: boolean;
 			pitmaster: boolean;
 		};
-		pid: [];
+		pid: {
+			name: string;
+			id: number;
+			aktor: number;
+			Kp: number;
+			Ki: number;
+			Kd: number;
+			DCmmin: number;
+			DCmmax: number;
+			opl: number;
+			SPmin: number;
+			SPmax: number;
+			link: number;
+			tune: number;
+			jp: number;
+		}[];
 		aktor: ['SSR', 'FAN', 'SERVO'];
 		display: {
 			updname: string;

@@ -282,6 +282,28 @@ class WlanthermoNano extends utils.Adapter {
 				);
 			}
 
+			// Create states for PID Profile
+			const pidProfile = activeDevices[device.ip].settings.pid;
+			for (let i = 0; i < pidProfile.length; i++) {
+				const sensorRoot = `${activeDevices[device.ip].settings.device.serial}.Pitmaster.Profiles.Profile_${
+					1 + +i
+				}`;
+				this.log.debug(`Create profile states ${sensorRoot}`);
+				await this.setObjectNotExistsAsync(sensorRoot, {
+					type: 'channel',
+					common: {
+						name: pidProfile[i].name,
+					},
+					native: {},
+				});
+
+				//  Write states for PID profiles
+				for (const [key, value] of Object.entries(pidProfile[i])) {
+					await this.setObjectAndState(`${sensorRoot}`, `${key}`, value);
+					this.subscribeStates(`${sensorRoot}.${key}`);
+				}
+			}
+
 			this.log.info(
 				`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`,
 			);
