@@ -77,14 +77,13 @@ class WlanthermoNano extends utils.Adapter {
         activeDevices[deviceIP].data = response_deviceData.data;
         this.log.debug(`${deviceIP} data | ${JSON.stringify(response_deviceData.data)}`);
         const serial = activeDevices[deviceIP].settings.device.serial;
-        for (const i in activeDevices[deviceIP].data.system) {
-          const value = activeDevices[deviceIP].data.system[i];
-          this.log.debug(`Create configuration state ${serial}.Configuration.${i} | ${value}`);
-          await this.setObjectAndState(`${serial}.Configuration`, `${i}`, value);
+        for (const [key, value] of Object.entries(activeDevices[deviceIP].data.system)) {
+          this.log.debug(`Create configuration state ${serial}.Configuration.${key} | ${value}`);
+          await this.setObjectAndState(`${serial}.Configuration`, `${key}`, value);
         }
         const channel = activeDevices[deviceIP].data.channel;
-        for (const i in channel) {
-          const sensorRoot = `${serial}.Sensors.Sensor_${1 + parseInt(i)}`;
+        for (let i = 0; i < channel.length; i++) {
+          const sensorRoot = `${serial}.Sensors.Sensor_${1 + +i}`;
           this.log.debug(`Create sensor states ${sensorRoot}`);
           await this.setObjectNotExistsAsync(sensorRoot, {
             type: "channel",
@@ -97,13 +96,13 @@ class WlanthermoNano extends utils.Adapter {
           for (const sensor in activeDevices[deviceIP].settings.sensors) {
             sensorTypes[sensor] = activeDevices[deviceIP].settings.sensors[sensor].name;
           }
-          for (const y in channel[i]) {
-            switch (y) {
+          for (const [key, value] of Object.entries(channel[i])) {
+            switch (key) {
               case "typ":
-                await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+                await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
                   type: "state",
                   common: {
-                    name: y,
+                    name: key,
                     role: "switch.mode",
                     read: true,
                     type: "number",
@@ -113,14 +112,14 @@ class WlanthermoNano extends utils.Adapter {
                   },
                   native: {}
                 });
-                this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
-                this.subscribeStates(`${sensorRoot}.${y}`);
+                this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
+                this.subscribeStates(`${sensorRoot}.${key}`);
                 break;
               case "alarm":
-                await this.setObjectNotExistsAsync(`${sensorRoot}.${y}`, {
+                await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
                   type: "state",
                   common: {
-                    name: y,
+                    name: key,
                     role: "indicator.alarm",
                     read: true,
                     type: "number",
@@ -135,54 +134,54 @@ class WlanthermoNano extends utils.Adapter {
                   },
                   native: {}
                 });
-                this.setState(`${sensorRoot}.${y}`, { val: channel[i][y], ack: true });
-                this.subscribeStates(`${sensorRoot}.${y}`);
+                this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
+                this.subscribeStates(`${sensorRoot}.${key}`);
                 break;
               case "temp":
-                await this.setObjectAndState(`${sensorRoot}`, `${y}`, null);
-                if (channel[i][y] !== 999) {
-                  this.setState(`${sensorRoot}.${y}`, {
-                    val: channel[i][y],
+                await this.setObjectAndState(`${sensorRoot}`, `${key}`, null);
+                if (channel[i][key] !== 999) {
+                  this.setState(`${sensorRoot}.${key}`, {
+                    val: channel[i][key],
                     ack: true,
                     expire: activeDevices[deviceIP].basicInfo.interval * 2e3
                   });
                 } else {
-                  this.setState(`${sensorRoot}.${y}`, { val: null, ack: true });
+                  this.setState(`${sensorRoot}.${key}`, { val: null, ack: true });
                 }
                 break;
               default:
-                await this.setObjectAndState(`${sensorRoot}`, `${y}`, channel[i][y]);
-                this.subscribeStates(`${sensorRoot}.${y}`);
+                await this.setObjectAndState(`${sensorRoot}`, `${key}`, value);
+                this.subscribeStates(`${sensorRoot}.${key}`);
             }
           }
-        }
-        const pitmaster = activeDevices[deviceIP].data.pitmaster;
-        for (const i in pitmaster.pm) {
-          const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + parseInt(i)}`;
-          this.log.debug(`Create Pitmaster states ${stateRoot}`);
-          await this.setObjectNotExistsAsync(stateRoot, {
-            type: "channel",
-            common: {
-              name: "Pitmaster"
-            },
-            native: {}
+          const pitmaster = activeDevices[deviceIP].data.pitmaster;
+          for (let i2 = 0; i2 < pitmaster.pm.length; i2++) {
+            const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + i2}`;
+            this.log.debug(`Create Pitmaster states ${stateRoot}`);
+            await this.setObjectNotExistsAsync(stateRoot, {
+              type: "channel",
+              common: {
+                name: "Pitmaster"
+              },
+              native: {}
+            });
+            for (const [key, value] of Object.entries(pitmaster.pm[i2])) {
+              if (key === "typ") {
+                await this.setObjectAndState(`${stateRoot}`, `modus`, value);
+              } else if (key === "pid") {
+                await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
+              } else if (key === "set_color") {
+              } else if (key === "value_color") {
+              } else {
+                await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
+              }
+            }
+          }
+          this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
+            val: true,
+            ack: true
           });
-          for (const y in pitmaster.pm[i]) {
-            if (y === "typ") {
-              await this.setObjectAndState(`${stateRoot}`, `modus`, pitmaster.pm[i][y]);
-            } else if (y === "pid") {
-              await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
-            } else if (y === "set_color") {
-            } else if (y === "value_color") {
-            } else {
-              await this.setObjectAndState(`${stateRoot}`, `${y}`, pitmaster.pm[i][y]);
-            }
-          }
         }
-        this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
-          val: true,
-          ack: true
-        });
       }
     } catch (e) {
       this.log.debug(`[getDeviceData] ${e}`);
@@ -349,39 +348,22 @@ class WlanthermoNano extends utils.Adapter {
             }
           } else if (deviceId[3] === "Sensors") {
             const sensorID = parseInt(deviceId[4].replace("Sensor_", "")) - 1;
-            activeDevices[deviceIP].data.channel[sensorID][deviceId[5]] = state.val;
-            const array = {
-              number: activeDevices[deviceIP].data.channel[sensorID].number,
-              name: activeDevices[deviceIP].data.channel[sensorID].name,
-              typ: activeDevices[deviceIP].data.channel[sensorID].typ,
-              min: activeDevices[deviceIP].data.channel[sensorID].min,
-              max: activeDevices[deviceIP].data.channel[sensorID].max,
-              alarm: activeDevices[deviceIP].data.channel[sensorID].alarm,
-              color: activeDevices[deviceIP].data.channel[sensorID].color
-            };
+            const currentSensor = activeDevices[deviceIP].data.channel[sensorID];
+            currentSensor[deviceId[5]] = state.val;
             this.log.info(`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
-            await this.sendArray(url, array, "/setchannels");
+            await this.sendArray(url, activeDevices[deviceIP].data.channel[sensorID], "/setchannels");
             await this.getDeviceData(deviceIP);
           } else if (deviceId[3] === "Pitmaster") {
             try {
               this.log.info(`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
               const pitmasterID = parseInt(deviceId[4].replace("Pitmaster_", "")) - 1;
+              const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
               if ([deviceId[5]].toString() !== "modus") {
-                activeDevices[deviceIP].data.pitmaster.pm[pitmasterID][deviceId[5]] = state.val;
+                currentPM[deviceId[5]] = state.val;
               } else {
-                activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ = state.val.toString();
+                currentPM.typ = state.val.toString();
               }
-              const array = [
-                {
-                  id: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].id,
-                  channel: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].channel,
-                  pid: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].pid,
-                  value: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].value,
-                  set: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].set,
-                  typ: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ
-                }
-              ];
-              this.sendArray(url, array, "/setpitmaster");
+              this.sendArray(url, activeDevices[deviceIP].data.pitmaster.pm, "/setpitmaster");
               await this.getDeviceData(deviceIP);
             } catch (e) {
               this.log.error("Error in handling pitmaster state change" + e);

@@ -268,7 +268,7 @@ class WlanthermoNano extends utils.Adapter {
 				);
 			}
 
-			// Write states for features channel
+			// Create states for features channel
 			for (const [key, value] of Object.entries(activeDevices[device.ip].settings.features)) {
 				this.log.debug(
 					`Create feature state ${
@@ -432,24 +432,15 @@ class WlanthermoNano extends utils.Adapter {
 					} else if (deviceId[3] === 'Sensors') {
 						// Update value of state change to memory
 						const sensorID = parseInt(deviceId[4].replace('Sensor_', '')) - 1;
+						const currentSensor = activeDevices[deviceIP].data.channel[sensorID];
 
-						(activeDevices[deviceIP].data.channel[sensorID] as any)[deviceId[5]] = state.val;
-						// Prepare configuration data as array
-						const array = {
-							number: activeDevices[deviceIP].data.channel[sensorID].number,
-							name: activeDevices[deviceIP].data.channel[sensorID].name,
-							typ: activeDevices[deviceIP].data.channel[sensorID].typ,
-							min: activeDevices[deviceIP].data.channel[sensorID].min,
-							max: activeDevices[deviceIP].data.channel[sensorID].max,
-							alarm: activeDevices[deviceIP].data.channel[sensorID].alarm,
-							color: activeDevices[deviceIP].data.channel[sensorID].color,
-						};
+						(currentSensor as any)[deviceId[5]] = state.val;
 
 						this.log.info(
 							`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
 						);
 						// Send changes
-						await this.sendArray(url, array, '/setchannels');
+						await this.sendArray(url, activeDevices[deviceIP].data.channel[sensorID], '/setchannels');
 						// Refresh states
 						await this.getDeviceData(deviceIP);
 					} else if (deviceId[3] === 'Pitmaster') {
@@ -458,24 +449,14 @@ class WlanthermoNano extends utils.Adapter {
 								`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`,
 							);
 							const pitmasterID = parseInt(deviceId[4].replace('Pitmaster_', '')) - 1;
+							const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
 
 							if ([deviceId[5]].toString() !== 'modus') {
-								(activeDevices[deviceIP].data.pitmaster.pm[pitmasterID] as any)[deviceId[5]] =
-									state.val;
+								(currentPM as any)[deviceId[5]] = state.val;
 							} else {
-								activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ = state.val.toString();
+								currentPM.typ = state.val.toString();
 							}
-							const array = [
-								{
-									id: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].id,
-									channel: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].channel,
-									pid: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].pid,
-									value: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].value,
-									set: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].set,
-									typ: activeDevices[deviceIP].data.pitmaster.pm[pitmasterID].typ,
-								},
-							];
-							this.sendArray(url, array, '/setpitmaster');
+							this.sendArray(url, activeDevices[deviceIP].data.pitmaster.pm, '/setpitmaster');
 							// Refresh states
 							await this.getDeviceData(deviceIP);
 						} catch (e) {

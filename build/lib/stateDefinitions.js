@@ -56,7 +56,7 @@ const stateAttrb = {
     role: "value"
   },
   flash_size: {
-    type: "number",
+    type: "string",
     role: "value"
   },
   prerelease: {
