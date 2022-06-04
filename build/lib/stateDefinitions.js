@@ -101,8 +101,10 @@ const stateAttrb = {
     role: "info.item"
   },
   id: {
+    name: "Active Pitmaster Profile",
     type: "number",
-    role: "info.id"
+    role: "info.id",
+    write: true
   },
   getupdate: {
     type: "mixed",

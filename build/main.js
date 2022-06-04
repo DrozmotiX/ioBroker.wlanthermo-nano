@@ -170,8 +170,12 @@ class WlanthermoNano extends utils.Adapter {
                 await this.setObjectAndState(`${stateRoot}`, `modus`, value);
               } else if (key === "pid") {
                 await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
-              } else if (key === "set_color") {
-              } else if (key === "value_color") {
+              } else if (key === "id") {
+                const pidProfiles = {};
+                for (const profile in activeDevices[deviceIP].settings.pid) {
+                  pidProfiles[profile] = activeDevices[deviceIP].settings.pid[profile].name;
+                }
+                await this.setObjectAndState(`${stateRoot}`, `${key}`, value, pidProfiles);
               } else {
                 await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
               }
@@ -271,14 +275,17 @@ class WlanthermoNano extends utils.Adapter {
       this.sendSentry(`[deviceStructures] ${e}`);
     }
   }
-  async setObjectAndState(rootDIR, stateName, value) {
+  async setObjectAndState(rootDIR, stateName, value, stateDropDown) {
     try {
       let obj = import_stateDefinitions.BasicStates[stateName];
       if (!obj) {
         obj = (0, import_stateDefinitions.buildCommon)(stateName);
       }
+      if (stateDropDown != null) {
+        obj.common.states = stateDropDown;
+      }
       if (createdObjs.indexOf(`${rootDIR}.${stateName}`) === -1) {
-        await this.setObjectNotExistsAsync(`${rootDIR}.${stateName}`, {
+        await this.extendObjectAsync(`${rootDIR}.${stateName}`, {
           type: obj.type,
           common: JSON.parse(JSON.stringify(obj.common)),
           native: JSON.parse(JSON.stringify(obj.native))

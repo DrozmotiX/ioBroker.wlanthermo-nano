@@ -187,9 +187,12 @@ class WlanthermoNano extends utils.Adapter {
 								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
 								// Subscribe on state
 								// this.subscribeStates(`${stateRoot}.${y}`);
-							} else if (key === 'set_color') {
-								// ignore set_color
-							} else if (key === 'value_color') {
+							} else if (key === 'id') {
+								const pidProfiles: { [key: string]: string } = {};
+								for (const profile in activeDevices[deviceIP].settings.pid) {
+									pidProfiles[profile] = activeDevices[deviceIP].settings.pid[profile].name;
+								}
+								await this.setObjectAndState(`${stateRoot}`, `${key}`, value, pidProfiles);
 								// ignore set_color
 							} else {
 								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
@@ -333,7 +336,12 @@ class WlanthermoNano extends utils.Adapter {
 		}
 	}
 
-	private async setObjectAndState(rootDIR: string, stateName: string, value: any | null): Promise<void> {
+	private async setObjectAndState(
+		rootDIR: string,
+		stateName: string,
+		value: any | null,
+		stateDropDown?: { [key: string]: string },
+	): Promise<void> {
 		try {
 			let obj: MyObjectsDefinitions = BasicStates[stateName];
 
@@ -341,9 +349,13 @@ class WlanthermoNano extends utils.Adapter {
 				obj = buildCommon(stateName);
 			}
 
+			if (stateDropDown != null) {
+				obj.common.states = stateDropDown;
+			}
+
 			// Check if the object must be created
 			if (createdObjs.indexOf(`${rootDIR}.${stateName}`) === -1) {
-				await this.setObjectNotExistsAsync(`${rootDIR}.${stateName}`, {
+				await this.extendObjectAsync(`${rootDIR}.${stateName}`, {
 					type: obj.type,
 					common: JSON.parse(JSON.stringify(obj.common)),
 					native: JSON.parse(JSON.stringify(obj.native)),
