@@ -24,9 +24,10 @@ __export(stateDefinitions_exports, {
 module.exports = __toCommonJS(stateDefinitions_exports);
 const stateAttrb = {
   alarm: {
-    type: "boolean",
-    role: "sensor.alarm",
-    write: true
+    role: "indicator.alarm",
+    type: "number",
+    write: true,
+    def: 0
   },
   ap: {
     type: "mixed",
@@ -188,9 +189,11 @@ const stateAttrb = {
     role: "value.time"
   },
   typ: {
-    type: "mixed",
-    role: "info.typ",
-    write: true
+    name: "Sensor type",
+    role: "switch.mode",
+    type: "number",
+    write: true,
+    def: 0
   },
   unit: {
     type: "mixed",

@@ -103,47 +103,18 @@ class WlanthermoNano extends utils.Adapter {
 					for (const [key, value] of Object.entries(channel[i])) {
 						switch (key) {
 							case 'typ':
-								await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
-									type: 'state',
-									common: {
-										name: key,
-										role: 'switch.mode',
-										read: true,
-										type: 'number',
-										write: true,
-										states: sensorTypes,
-										def: 0,
-									},
-									native: {},
-								});
-
-								this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
+								await this.setObjectAndState(`${sensorRoot}`, `${key}`, value, sensorTypes);
 								this.subscribeStates(`${sensorRoot}.${key}`);
 
 								break;
 
 							case 'alarm':
-								await this.setObjectNotExistsAsync(`${sensorRoot}.${key}`, {
-									type: 'state',
-									common: {
-										name: key,
-										role: 'indicator.alarm',
-										read: true,
-										type: 'number',
-										write: true,
-										states: {
-											'0': 'Disabled',
-											'1': 'Push-Only',
-											'2': 'Speaker-Only',
-											'4': 'Push & Speaker',
-										},
-										def: 0,
-									},
-									native: {},
+								await this.setObjectAndState(`${sensorRoot}`, `${key}`, value, {
+									'0': 'Disabled',
+									'1': 'Push-Only',
+									'2': 'Speaker-Only',
+									'4': 'Push & Speaker',
 								});
-								this.setState(`${sensorRoot}.${key}`, { val: value, ack: true });
-								this.subscribeStates(`${sensorRoot}.${key}`);
-
 								break;
 
 							case 'temp':

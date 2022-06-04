@@ -23,9 +23,10 @@ interface MyStateCommon extends Partial<ioBroker.StateCommon> {
 
 const stateAttrb: StateAttr = {
 	alarm: {
-		type: 'boolean',
-		role: 'sensor.alarm',
+		role: 'indicator.alarm',
+		type: 'number',
 		write: true,
+		def: 0,
 	},
 	ap: {
 		type: 'mixed',
@@ -187,9 +188,11 @@ const stateAttrb: StateAttr = {
 		role: 'value.time',
 	},
 	typ: {
-		type: 'mixed',
-		role: 'info.typ',
+		name: 'Sensor type',
+		role: 'switch.mode',
+		type: 'number',
 		write: true,
+		def: 0,
 	},
 	unit: {
 		type: 'mixed',
