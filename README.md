@@ -37,6 +37,7 @@ If you like my work, please feel free to provide a personal donation
 ## Changelog
 * (DutchmanNL) Refactor code
 * (DutchmanNL) Add states for features
+* (DutchmanNL) Allow alarm to be activated / disabled #6
 
 ### 0.2.0-beta.1 (2022-06-03)
 * (DutchmanNL) Refactor code

@@ -130,7 +130,7 @@ class WlanthermoNano extends utils.Adapter {
 										role: 'indicator.alarm',
 										read: true,
 										type: 'number',
-										write: false,
+										write: true,
 										states: {
 											'0': 'Disabled',
 											'1': 'Push-Only',
