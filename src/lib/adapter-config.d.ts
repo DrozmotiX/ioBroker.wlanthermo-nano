@@ -88,6 +88,10 @@ declare global {
 	};
 
 	type DeviceData = {
+		features: {
+			bluetooth: boolean;
+			pitmaster: boolean;
+		};
 		system: {
 			time: number;
 			unit: string;

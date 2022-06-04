@@ -228,6 +228,10 @@ class WlanthermoNano extends utils.Adapter {
         this.log.debug(`Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${response_settings.data.device[i]}`);
         await this.setObjectAndState(`${activeDevices[device.ip].settings.device.serial}.Info`, `${i}`, `${response_settings.data.device[i]}`);
       }
+      for (const [key, value] of Object.entries(activeDevices[device.ip].settings.features)) {
+        this.log.debug(`Create feature state ${activeDevices[device.ip].settings.device.serial}.features.${key} | ${value}`);
+        await this.setObjectAndState(`${activeDevices[device.ip].settings.device.serial}.Features`, `${key}`, value);
+      }
       this.log.info(`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`);
       this.getDeviceData(ip);
     } catch (e) {

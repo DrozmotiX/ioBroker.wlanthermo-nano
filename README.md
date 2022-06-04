@@ -34,8 +34,10 @@ If you like my work, please feel free to provide a personal donation
 (this is an personal Donate link for DutchmanNL, no relation to the ioBroker Project !)  
 [![Donate](https://raw.githubusercontent.com/DrozmotiX/ioBroker.wled/master/admin/button.png)](http://paypal.me/DutchmanNL)
 
-
 ## Changelog
+* (DutchmanNL) Refactor code
+* (DutchmanNL) Add states for features
+
 ### 0.2.0-beta.1 (2022-06-03)
 * (DutchmanNL) Refactor code
 * (DutchmanNL) Allow control of pitmaster & system settings

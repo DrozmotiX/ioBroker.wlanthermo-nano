@@ -217,6 +217,13 @@ const BasicStates = {
     },
     native: {}
   },
+  Features: {
+    type: "channel",
+    common: {
+      name: "Available features"
+    },
+    native: {}
+  },
   Info: {
     type: "channel",
     common: {
