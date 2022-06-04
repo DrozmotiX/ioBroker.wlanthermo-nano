@@ -282,7 +282,7 @@ class WlanthermoNano extends utils.Adapter {
   onUnload(callback) {
     try {
       for (const device in activeDevices) {
-        if (polling[device]) {
+        if (polling != null && polling[device] != null) {
           clearTimeout(polling[device]);
           polling[device] = {};
         }
@@ -358,12 +358,12 @@ class WlanthermoNano extends utils.Adapter {
                 const currentProfiles = activeDevices[deviceIP].settings.pid;
                 currentProfiles[profileID][deviceId[6]] = state.val;
                 this.sendArray(url, currentProfiles, "/setpid");
-                this.log.info(`${deviceIP} Pitmaster profile changed ${deviceId[5]} ${deviceId[6]} | ${state.val}, reconnecting device`);
+                this.log.info(`${deviceIP} Pitmaster profile ${profileID} changed ${deviceId[6]} | ${state.val}, reconnecting device`);
                 activeDevices[deviceIP].initialised = false;
                 await this.getDeviceData(deviceIP);
               } else {
-                this.log.info(`${deviceIP} Pitmaster configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
                 const pitmasterID = parseInt(deviceId[4].replace("Pitmaster_", "")) - 1;
+                this.log.info(`${deviceIP} Pitmaster ${pitmasterID} configuration changed ${deviceId[5]} | ${state.val}`);
                 const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
                 if ([deviceId[5]].toString() !== "modus") {
                   currentPM[deviceId[5]] = state.val;

@@ -35,24 +35,19 @@ If you like my work, please feel free to provide a personal donation
 [![Donate](https://raw.githubusercontent.com/DrozmotiX/ioBroker.wled/master/admin/button.png)](http://paypal.me/DutchmanNL)
 
 ## Changelog
-* (DutchmanNL) Refactor code
-* (DutchmanNL) Added datapoints for features
-* (DutchmanNL) Allow alarm to be activated / disabled #6
-* (DutchmanNL) Added datapoints for PID profiles including capability to change profile settings
-* (DutchmanNL) Implemented dropdown menu for Pitmaster to select available profiles
 
-### 0.2.0-beta.1 (2022-06-03)
-* (DutchmanNL) Refactor code
-* (DutchmanNL) Allow control of pitmaster & system settings
-
-### 0.2.0-beta.0 (2022-06-02) - Adapter rebuild to TypeScript
 * (DutchmanNL) Support multiple devices
+* (DutchmanNL) Refactor code to TypeScript
 * (DutchmanNL) Error/debug logging Improved
-* (DutchmanNL) Adapter rebuild to TypeScript
+* (DutchmanNL) Added data points for features
 * (DutchmanNL) Test & Release workflow updated
 * (DutchmanNL) Added indicator for connection status
 * (DutchmanNL) Reconnecting to offline devices improved
+* (DutchmanNL) Allow alarm to be activated / disabled #6
+* (DutchmanNL) Allow control of pitmaster & system settings
 * (DutchmanNL) Ensure support of all WLANThermo-Nano Devices
+* (DutchmanNL) Implemented dropdown menu for Pitmaster to select available profiles
+* (DutchmanNL) Added data points for PID profiles including capability to change profile settings
 
 ### 0.1.2
 * (DutchmanNL) Support multiple devices
