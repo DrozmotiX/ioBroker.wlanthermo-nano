@@ -243,17 +243,19 @@ class WlanthermoNano extends utils.Adapter {
 			}
 
 			// Create states for features channel
-			for (const [key, value] of Object.entries(activeDevices[device.ip].settings.features)) {
-				this.log.debug(
-					`Create feature state ${
-						activeDevices[device.ip].settings.device.serial
-					}.features.${key} | ${value}`,
-				);
-				await this.setObjectAndState(
-					`${activeDevices[device.ip].settings.device.serial}.Features`,
-					`${key}`,
-					value,
-				);
+			if (activeDevices[device.ip].settings.features != null) {
+				for (const [key, value] of Object.entries(activeDevices[device.ip].settings.features)) {
+					this.log.debug(
+						`Create feature state ${
+							activeDevices[device.ip].settings.device.serial
+						}.features.${key} | ${value}`,
+					);
+					await this.setObjectAndState(
+						`${activeDevices[device.ip].settings.device.serial}.Features`,
+						`${key}`,
+						value,
+					);
+				}
 			}
 
 			// Create states for PID Profile
@@ -378,7 +380,7 @@ class WlanthermoNano extends utils.Adapter {
 		}
 	}
 
-	private errorHandler(source: string, error: unknown, debugMode?: boolean) {
+	private errorHandler(source: string, error: unknown, debugMode?: boolean): void {
 		let message = error;
 		if (error instanceof Error && error.stack != null) message = error.stack;
 		if (!debugMode) {
