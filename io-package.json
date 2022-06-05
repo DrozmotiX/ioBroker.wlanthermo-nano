@@ -1,20 +1,8 @@
 {
   "common": {
     "name": "wlanthermo-nano",
-    "version": "0.2.1-alpha.0",
+    "version": "0.2.1-alpha.1",
     "news": {
-      "0.2.1-alpha.0": {
-        "en": "Error logging and reporting improved",
-        "de": "Fehlerprotokollierung und -berichterstattung verbessert",
-        "ru": "Улучшено ведение журнала ошибок и создание отчетов.",
-        "pt": "Registo de erros e relatórios melhorados",
-        "nl": "Foutregistratie en rapportage verbeterd",
-        "fr": "Amélioration de la journalisation et des rapports d'erreurs",
-        "it": "Registrazione e segnalazione degli errori migliorati",
-        "es": "Registro de errores e informes mejorados",
-        "pl": "Poprawiono rejestrowanie błędów i raportowanie",
-        "zh-cn": "错误记录和报告改进"
-      },
       "0.1.2": {
         "en": "Support multiple devices",
         "de": "Unterstützt mehrere Geräte",
@@ -120,7 +108,7 @@
     },
     "plugins": {
       "sentry": {
-        "dsn": "https://7c3dff9381a44d32b1b94e5bc827b09d@sentry.drozmotix.eu/3"
+        "dsn": "https://d71b421bfac44586a4abde74a44db5fd@sentry.drozmotix.eu/2"
       }
     },
     "eraseOnUpload": true,

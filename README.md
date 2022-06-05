@@ -37,8 +37,6 @@ If you like my work, please feel free to provide a personal donation
 ## Changelog
 ### __WORK IN PROGRESS__ - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
-
-### 0.2.1-alpha.0 (2022-06-05) - Error logging and reporting improved
 * (DutchmanNL) Error logging and reporting improved
 
 ### 0.2.0 (2022-06-04) - PitMaster Control & ESP32 support
