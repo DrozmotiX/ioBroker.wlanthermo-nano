@@ -137,43 +137,45 @@ class WlanthermoNano extends utils.Adapter {
 					}
 
 					//  Write states for pitmaster
-					const pitmaster = activeDevices[deviceIP].data.pitmaster;
-					for (let i = 0; i < pitmaster.pm.length; i++) {
-						const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + i}`;
-						this.log.debug(`Create Pitmaster states ${stateRoot}`);
-						await this.setObjectNotExistsAsync(stateRoot, {
-							type: 'channel',
-							common: {
-								name: 'Pitmaster',
-							},
-							native: {},
-						});
+					if (activeDevices[deviceIP].data.pitmaster != null) {
+						const pitmaster = activeDevices[deviceIP].data.pitmaster;
+						for (let i = 0; i < pitmaster.pm.length; i++) {
+							const stateRoot = `${serial}.Pitmaster.Pitmaster_${1 + i}`;
+							this.log.debug(`Create Pitmaster states ${stateRoot}`);
+							await this.setObjectNotExistsAsync(stateRoot, {
+								type: 'channel',
+								common: {
+									name: 'Pitmaster',
+								},
+								native: {},
+							});
 
-						for (const [key, value] of Object.entries(pitmaster.pm[i])) {
-							if (key === 'typ') {
-								await this.setObjectAndState(`${stateRoot}`, `modus`, value);
-								// Subscribe on state
-								// this.subscribeStates(`${stateRoot}.modus`);
-							} else if (key === 'pid') {
-								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
-								// Subscribe on state
-								// this.subscribeStates(`${stateRoot}.${y}`);
-							} else if (key === 'id') {
-								const pidProfiles: { [key: string]: string } = {};
-								for (const profile in activeDevices[deviceIP].settings.pid) {
-									pidProfiles[profile] = activeDevices[deviceIP].settings.pid[profile].name;
+							for (const [key, value] of Object.entries(pitmaster.pm[i])) {
+								if (key === 'typ') {
+									await this.setObjectAndState(`${stateRoot}`, `modus`, value);
+									// Subscribe on state
+									// this.subscribeStates(`${stateRoot}.modus`);
+								} else if (key === 'pid') {
+									await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
+									// Subscribe on state
+									// this.subscribeStates(`${stateRoot}.${y}`);
+								} else if (key === 'id') {
+									const pidProfiles: { [key: string]: string } = {};
+									for (const profile in activeDevices[deviceIP].settings.pid) {
+										pidProfiles[profile] = activeDevices[deviceIP].settings.pid[profile].name;
+									}
+									await this.setObjectAndState(`${stateRoot}`, `${key}`, value, pidProfiles);
+									// ignore set_color
+								} else {
+									await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
 								}
-								await this.setObjectAndState(`${stateRoot}`, `${key}`, value, pidProfiles);
-								// ignore set_color
-							} else {
-								await this.setObjectAndState(`${stateRoot}`, `${key}`, value);
 							}
 						}
+						this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
+							val: true,
+							ack: true,
+						});
 					}
-					this.setState(`${activeDevices[deviceIP].settings.device.serial}.Info.connected`, {
-						val: true,
-						ack: true,
-					});
 				}
 			}
 		} catch (error) {
@@ -259,24 +261,26 @@ class WlanthermoNano extends utils.Adapter {
 			}
 
 			// Create states for PID Profile
-			const pidProfile = activeDevices[device.ip].settings.pid;
-			for (let i = 0; i < pidProfile.length; i++) {
-				const sensorRoot = `${activeDevices[device.ip].settings.device.serial}.Pitmaster.Profiles.Profile_${
-					1 + +i
-				}`;
-				this.log.debug(`Create profile states ${sensorRoot}`);
-				await this.setObjectNotExistsAsync(sensorRoot, {
-					type: 'channel',
-					common: {
-						name: pidProfile[i].name,
-					},
-					native: {},
-				});
+			if (activeDevices[device.ip].settings.pid != null) {
+				const pidProfile = activeDevices[device.ip].settings.pid;
+				for (let i = 0; i < pidProfile.length; i++) {
+					const sensorRoot = `${activeDevices[device.ip].settings.device.serial}.Pitmaster.Profiles.Profile_${
+						1 + +i
+					}`;
+					this.log.debug(`Create profile states ${sensorRoot}`);
+					await this.setObjectNotExistsAsync(sensorRoot, {
+						type: 'channel',
+						common: {
+							name: pidProfile[i].name,
+						},
+						native: {},
+					});
 
-				//  Write states for PID profiles
-				for (const [key, value] of Object.entries(pidProfile[i])) {
-					await this.setObjectAndState(`${sensorRoot}`, `${key}`, value);
-					this.subscribeStates(`${sensorRoot}.${key}`);
+					//  Write states for PID profiles
+					for (const [key, value] of Object.entries(pidProfile[i])) {
+						await this.setObjectAndState(`${sensorRoot}`, `${key}`, value);
+						this.subscribeStates(`${sensorRoot}.${key}`);
+					}
 				}
 			}
 
