@@ -357,25 +357,27 @@ class WlanthermoNano extends utils.Adapter {
 	private onUnload(callback: () => void): void {
 		try {
 			// Clear running timer
-			for (const device in activeDevices) {
-				if (polling != null && polling[device] != null) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					clearTimeout(polling[device]);
-					polling[device] = {};
-				}
-				if (`${activeDevices[device]}` != null && `${activeDevices[device].settings}` != null) {
-					this.setState(`${activeDevices[device].settings.device.serial}.Info.connected`, {
-						val: false,
-						ack: true,
-					});
+			if (activeDevices != null) {
+				for (const device in activeDevices) {
+					if (polling != null && polling[device] != null) {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						clearTimeout(polling[device]);
+						polling[device] = {};
+					}
+					if (activeDevices[device] != null && activeDevices[device].settings != null) {
+						this.setState(`${activeDevices[device].settings.device.serial}.Info.connected`, {
+							val: false,
+							ack: true,
+						});
+					}
 				}
 			}
 
 			callback();
 		} catch (e) {
 			this.log.error(`[onUnload] ${e}`);
-			this.sendSentry(`[onUnload] ${e} | DeviceMemory ${activeDevices}`);
+			this.sendSentry(`[onUnload] ${e} | DeviceMemory ${JSON.stringify(activeDevices)}`);
 			callback();
 		}
 	}
