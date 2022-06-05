@@ -1,15 +1,15 @@
 ![Logo](admin/wlanthermo-nano.png)
 # ioBroker.wlanthermo-nano
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
+[![NPM version](https://img.shields.io/npm/v/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.wlanthermo-nano.svg)](https://www.npmjs.com/package/iobroker.wlanthermo-nano)
+![Number of Installations](https://iobroker.live/badges/wlanthermo-nano-installed.svg)
+![Current version in stable repository](https://iobroker.live/badges/wlanthermo-nano-stable.svg)
 [![Dependency Status](https://img.shields.io/david/DrozmotiX/iobroker.wlanthermo-nano.svg)](https://david-dm.org/DrozmotiX/iobroker.wlanthermo-nano)
-![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-installed.svg) ![Number of Installations](http://iobroker.live/badges/wlanthermo-nano-stable.svg)
-[![Known Vulnerabilities](https://snyk.io/test/github/DrozmotiX/ioBroker.wlanthermo-nano/badge.svg)](https://snyk.io/test/github/DrozmotiX/ioBroker.wlanthermo-nano)
 
 [![NPM](https://nodei.co/npm/iobroker.wlanthermo-nano.png?downloads=true)](https://nodei.co/npm/iobroker.wlanthermo-nano/)
 
-**Tests:**: [![Travis-CI](http://img.shields.io/travis/DrozmotiX/ioBroker.wlanthermo-nano/master.svg)](https://travis-ci.org/DrozmotiX/ioBroker.wlanthermo-nano)
+**Tests:** ![Test and Release](https://github.com/DrozmotiX/iobroker.wlanthermo-nano/workflows/Test%20and%20Release/badge.svg)
 
 ## wlanthermo-nano adapter for ioBroker
 
