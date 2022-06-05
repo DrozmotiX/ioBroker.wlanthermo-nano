@@ -35,6 +35,9 @@ If you like my work, please feel free to provide a personal donation
 [![Donate](https://raw.githubusercontent.com/DrozmotiX/ioBroker.wled/master/admin/button.png)](http://paypal.me/DutchmanNL)
 
 ## Changelog
+### __WORK IN PROGRESS__ - Improve error logging/reporting
+* (DutchmanNL) Improve error logging/reporting
+
 ### 0.2.0 (2022-06-04) - PitMaster Control & ESP32 support
 * (DutchmanNL) Support multiple devices
 * (DutchmanNL) Refactor code to TypeScript

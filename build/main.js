@@ -160,8 +160,8 @@ class WlanthermoNano extends utils.Adapter {
           });
         }
       }
-    } catch (e) {
-      this.log.debug(`[getDeviceData] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[getDeviceData]`, error, true);
       if (activeDevices[deviceIP].initialised) {
         this.log.warn(`${deviceIP} Connection lost, will try to reconnect`);
       }
@@ -171,8 +171,8 @@ class WlanthermoNano extends utils.Adapter {
           val: false,
           ack: true
         });
-      } catch (e2) {
-        console.error(e2);
+      } catch (error2) {
+        console.error(error2);
       }
     }
     if (polling[deviceIP]) {
@@ -226,10 +226,10 @@ class WlanthermoNano extends utils.Adapter {
       }
       this.log.info(`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`);
       this.getDeviceData(ip);
-    } catch (e) {
-      this.log.debug(`[initialiseDevice] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[initialiseDevice]`, error, true);
       if (initializing) {
-        this.log.warn(`${ip} Connection failed, will try again later ${e}`);
+        this.log.warn(`${ip} Connection failed, will try again later ${error}`);
       }
       activeDevices[ip].initialised = false;
     }
@@ -243,9 +243,8 @@ class WlanthermoNano extends utils.Adapter {
         this.log.debug(`Create basic state ${serial}.${object}`);
         await this.setObjectAndState(`${serial}`, `${object}`, null);
       }
-    } catch (e) {
-      this.log.error(`[deviceStructures] ${e}`);
-      this.sendSentry(`[deviceStructures] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[deviceStructures]`, error);
     }
   }
   async setObjectAndState(rootDIR, stateName, value, stateDropDown) {
@@ -274,9 +273,8 @@ class WlanthermoNano extends utils.Adapter {
           ack: true
         });
       }
-    } catch (e) {
-      this.log.error(`[setObjectAndState] ${e}`);
-      this.sendSentry(`[setObjectAndState] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[setObjectAndState]`, error);
     }
   }
   onUnload(callback) {
@@ -296,10 +294,21 @@ class WlanthermoNano extends utils.Adapter {
         }
       }
       callback();
-    } catch (e) {
-      this.log.error(`[onUnload] ${e}`);
-      this.sendSentry(`[onUnload] ${e} | DeviceMemory ${JSON.stringify(activeDevices)}`);
+    } catch (error) {
+      this.errorHandler(`[onUnload]`, error);
       callback();
+    }
+  }
+  errorHandler(source, error, debugMode) {
+    let message = error;
+    if (error instanceof Error && error.stack != null)
+      message = error.stack;
+    if (!debugMode) {
+      this.log.error(`${source} ${error}`);
+      this.sendSentry(`${source} ${message}`);
+    } else {
+      this.log.debug(`${source} ${error}`);
+      this.log.debug(`${source} ${message}`);
     }
   }
   async onStateChange(id, state) {
@@ -383,9 +392,8 @@ class WlanthermoNano extends utils.Adapter {
       } else {
         this.log.debug(`state ${id} deleted`);
       }
-    } catch (e) {
-      this.log.error(`[onStateChange] ${e}`);
-      this.sendSentry(`[onStateChange] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[onStateChange]`, error);
     }
   }
   async sendArray(url, array, type) {
@@ -396,9 +404,8 @@ class WlanthermoNano extends utils.Adapter {
       const post_url = `${url}${type}`;
       const respons = import_axios.default.post(post_url, array);
       return respons;
-    } catch (e) {
-      this.log.error(`[sendArray] ${e}`);
-      this.sendSentry(`[sendArray] ${e}`);
+    } catch (error) {
+      this.errorHandler(`[onStateChange]`, error);
     }
   }
   sendSentry(error) {
