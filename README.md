@@ -37,6 +37,8 @@ If you like my work, please feel free to provide a personal donation
 ## Changelog
 Keine lust zu schreiben, probiert doch einfach mal !
 
+asadasf
+safasafa
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
 * (DutchmanNL) Error logging and reporting improved
