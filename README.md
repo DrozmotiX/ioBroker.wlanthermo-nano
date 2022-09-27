@@ -39,9 +39,15 @@ Keine lust zu schreiben, probiert doch einfach mal !
 
 uigasfhshgdaljsf
 
+
 asadasf
+
+
 safasafa
+
+
 adafssaff
+
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
 * (DutchmanNL) Error logging and reporting improved
