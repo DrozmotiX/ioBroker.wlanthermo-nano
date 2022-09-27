@@ -20,7 +20,7 @@
 The adapter can be installed and configured within the admin interface.
 Please enter IP-address, username and password in the instance configuration.
 
-## To-Do
+## To-Do >>>> Wir jetzt aber mal zeit !
 
 * [ ] Implement auto device detect
 * [ ] Optimize pitmaster settings, make states only writable in related modus otherwise read only
@@ -35,6 +35,8 @@ If you like my work, please feel free to provide a personal donation
 [![Donate](https://raw.githubusercontent.com/DrozmotiX/ioBroker.wled/master/admin/button.png)](http://paypal.me/DutchmanNL)
 
 ## Changelog
+Keine lust zu schreiben, probiert doch einfach mal !
+
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
 * (DutchmanNL) Error logging and reporting improved
