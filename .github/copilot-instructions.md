@@ -7,7 +7,7 @@ Always reference these instructions first and fallback to search or bash command
 ## Working Effectively
 
 - Bootstrap, build, and test the repository:
-  - Node.js v20+ is required (repository tested with v20.19.4)
+  - Node.js 12.x, 14.x, or 16.x is supported (CI tests on all three versions)
   - `npm ci` -- installs dependencies. Takes ~50 seconds. NEVER CANCEL.
   - `npm run build` -- builds TypeScript and React components. Takes ~4 seconds.
   - `npm test` -- runs unit and package validation tests. Takes ~3 seconds.
@@ -123,7 +123,7 @@ The following are outputs from frequently run commands. Reference them instead o
 
 ## Common Troubleshooting
 
-- If build fails, ensure Node.js v20+ is installed
+- If build fails, ensure Node.js 12.x, 14.x, or 16.x is installed
 - If TypeScript errors occur, run `npm run check` to see detailed type issues
 - If tests fail, ensure no real WLANThermo devices are running on test IPs
 - Integration test timeouts are expected when no real devices are available
