@@ -1,26 +1,10 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -29,7 +13,10 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
 var import_stateDefinitions = require("./lib/stateDefinitions");
@@ -40,9 +27,10 @@ const createdObjs = [];
 let initializing = true;
 class WlanthermoNano extends utils.Adapter {
   constructor(options = {}) {
-    super(__spreadProps(__spreadValues({}, options), {
+    super({
+      ...options,
       name: "wlanthermo-nano"
-    }));
+    });
     this.on("ready", this.onReady.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
     this.on("unload", this.onUnload.bind(this));
@@ -203,13 +191,25 @@ class WlanthermoNano extends utils.Adapter {
       this.log.debug(`${ip} memory cache | ${JSON.stringify(activeDevices[device.ip])}`);
       await this.deviceStructures(activeDevices[device.ip].settings.device.serial, device.ip);
       for (const i in response_settings.data.device) {
-        this.log.debug(`Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${response_settings.data.device[i]}`);
-        await this.setObjectAndState(`${activeDevices[device.ip].settings.device.serial}.Info`, `${i}`, `${response_settings.data.device[i]}`);
+        this.log.debug(
+          `Create device settings state ${activeDevices[device.ip].settings.device.serial}.Info.${i} | ${response_settings.data.device[i]}`
+        );
+        await this.setObjectAndState(
+          `${activeDevices[device.ip].settings.device.serial}.Info`,
+          `${i}`,
+          `${response_settings.data.device[i]}`
+        );
       }
       if (activeDevices[device.ip].settings.features != null) {
         for (const [key, value] of Object.entries(activeDevices[device.ip].settings.features)) {
-          this.log.debug(`Create feature state ${activeDevices[device.ip].settings.device.serial}.features.${key} | ${value}`);
-          await this.setObjectAndState(`${activeDevices[device.ip].settings.device.serial}.Features`, `${key}`, value);
+          this.log.debug(
+            `Create feature state ${activeDevices[device.ip].settings.device.serial}.features.${key} | ${value}`
+          );
+          await this.setObjectAndState(
+            `${activeDevices[device.ip].settings.device.serial}.Features`,
+            `${key}`,
+            value
+          );
         }
       }
       if (activeDevices[device.ip].settings.pid != null) {
@@ -230,7 +230,9 @@ class WlanthermoNano extends utils.Adapter {
           }
         }
       }
-      this.log.info(`${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`);
+      this.log.info(
+        `${ip} Connected, refreshing data every ${activeDevices[device.ip].basicInfo.interval} seconds`
+      );
       this.getDeviceData(ip);
     } catch (error) {
       this.errorHandler(`[initialiseDevice]`, error, true);
@@ -345,7 +347,9 @@ class WlanthermoNano extends utils.Adapter {
               this.setState(`${id}`, { val: false, ack: true });
               this.log.info(`${deviceIP} Device update requested ${response.status}`);
             } else {
-              this.log.info(`${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}, reconnecting device`);
+              this.log.info(
+                `${deviceIP} Device configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}, reconnecting device`
+              );
               activeDevices[deviceIP].settings.system[deviceId[5]] = state.val;
               const array = {
                 ap: activeDevices[deviceIP].settings.system.ap,
@@ -363,7 +367,9 @@ class WlanthermoNano extends utils.Adapter {
             const sensorID = parseInt(deviceId[4].replace("Sensor_", "")) - 1;
             const currentSensor = activeDevices[deviceIP].data.channel[sensorID];
             currentSensor[deviceId[5]] = state.val;
-            this.log.info(`${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`);
+            this.log.info(
+              `${deviceIP} Sensor configuration changed ${deviceId[4]} ${deviceId[5]} | ${state.val}`
+            );
             await this.sendArray(url, activeDevices[deviceIP].data.channel[sensorID], "/setchannels");
             await this.getDeviceData(deviceIP);
           } else if (deviceId[3] === "Pitmaster") {
@@ -375,12 +381,16 @@ class WlanthermoNano extends utils.Adapter {
                 const currentProfiles = activeDevices[deviceIP].settings.pid;
                 currentProfiles[profileID][deviceId[6]] = state.val;
                 this.sendArray(url, currentProfiles, "/setpid");
-                this.log.info(`${deviceIP} Pitmaster profile ${profileID} changed ${deviceId[6]} | ${state.val}, reconnecting device`);
+                this.log.info(
+                  `${deviceIP} Pitmaster profile ${profileID} changed ${deviceId[6]} | ${state.val}, reconnecting device`
+                );
                 activeDevices[deviceIP].initialised = false;
                 await this.getDeviceData(deviceIP);
               } else {
                 const pitmasterID = parseInt(deviceId[4].replace("Pitmaster_", "")) - 1;
-                this.log.info(`${deviceIP} Pitmaster ${pitmasterID} configuration changed ${deviceId[5]} | ${state.val}`);
+                this.log.info(
+                  `${deviceIP} Pitmaster ${pitmasterID} configuration changed ${deviceId[5]} | ${state.val}`
+                );
                 const currentPM = activeDevices[deviceIP].data.pitmaster.pm[pitmasterID];
                 if ([deviceId[5]].toString() !== "modus") {
                   currentPM[deviceId[5]] = state.val;
