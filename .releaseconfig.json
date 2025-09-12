@@ -1,0 +1,9 @@
+{
+    "plugins": [
+        "@alcalzone/release-script-plugin-iobroker",
+        "@alcalzone/release-script-plugin-license"
+    ],
+    "changelog": {
+        "exclude": ["dependabot"]
+    }
+}

@@ -332,10 +332,10 @@ class WlanthermoNano extends utils.Adapter {
 			// Check if the object must be created
 			if (createdObjs.indexOf(`${rootDIR}.${stateName}`) === -1) {
 				await this.extendObjectAsync(`${rootDIR}.${stateName}`, {
-					type: obj.type,
+					type: obj.type as ioBroker.ObjectType,
 					common: JSON.parse(JSON.stringify(obj.common)),
 					native: JSON.parse(JSON.stringify(obj.native)),
-				});
+				} as ioBroker.SettableObject);
 				// Remember created object for this runtime
 				createdObjs.push(`${rootDIR}.${stateName}`);
 			}

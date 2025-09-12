@@ -27,18 +27,6 @@
                 "pl": "Obsługa wielu urządzeń\nRejestrowanie błędów/debugów Ulepszone\nOdbudowa adaptera do TypeScript\nZaktualizowano przepływ pracy Test & Release\nDodano wskaźnik statusu połączenia\nUlepszone ponowne łączenie z urządzeniami offline\nZapewnij obsługę wszystkich urządzeń WLANThermo-Nano",
                 "zh-cn": "支持多种设备\n错误/调试日志记录改进\n适配器重建到 TypeScript\n测试和发布工作流程更新\n添加了连接状态指示器\n重新连接到离线设备得到改进\n确保支持所有 WLANThermo-Nano 设备"
             },
-            "0.1.2": {
-                "en": "Support multiple devices",
-                "de": "Unterstützt mehrere Geräte",
-                "ru": "Поддержка нескольких устройств",
-                "pt": "Suporta vários dispositivos",
-                "nl": "Ondersteuning van meerdere apparaten",
-                "fr": "Soutenir plusieurs appareils",
-                "it": "Supporta più dispositivi",
-                "es": "Soporta múltiples dispositivos",
-                "pl": "Obsługuje wiele urządzeń",
-                "zh-cn": "支持多种设备"
-            },
             "0.1.1": {
                 "en": "Code optimalisation",
                 "de": "Code-Optimierung",
@@ -136,9 +124,14 @@
             }
         },
         "eraseOnUpload": true,
+        "globalDependencies": [
+            {
+                "admin": ">=6.17.14"
+            }
+        ],
         "dependencies": [
             {
-                "js-controller": ">=4.0.0"
+                "js-controller": ">=6.0.11"
             }
         ]
     },

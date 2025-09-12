@@ -12,6 +12,10 @@
     "deviceList": {
       "sm": 12,
       "type": "table",
+      "xs": 12,
+      "md": 12, 
+      "lg": 12,
+      "xl": 12,
       "items": [
         {"type": "text", "width": 2, "title": {"en": "ip-address"}, "attr": "ip", "filter": false, "sort": true, "default": ""},
         {"type": "text", "width": 2, "title": {"en": "username"}, "attr": "username", "filter": false, "sort": true, "default": ""},
