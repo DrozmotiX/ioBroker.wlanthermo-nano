@@ -121,6 +121,7 @@
         "extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/main/admin/wlanthermo-nano.png",
         "readme": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano/blob/main/README.md",
         "loglevel": "info",
+        "tier": 2,
         "mode": "daemon",
         "type": "household",
         "compact": true,
