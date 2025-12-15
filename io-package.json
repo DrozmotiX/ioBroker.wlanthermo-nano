@@ -115,7 +115,6 @@
         ],
         "license": "MIT",
         "platform": "Javascript/Node.js",
-        "main": "build/main.js",
         "icon": "wlanthermo-nano.png",
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/DrozmotiX/ioBroker.wlanthermo-nano/main/admin/wlanthermo-nano.png",
