@@ -9,6 +9,7 @@
   "homepage": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano",
   "license": "MIT",
   "keywords": [
+    "ioBroker",
     "iobroker-adapter"
   ],
   "repository": {
