@@ -7,7 +7,7 @@
 import * as utils from '@iobroker/adapter-core';
 
 // Load your modules here, e.g.:
-// import * as fs from "fs";
+// import * as fs from "node:fs";
 import axios from 'axios'; // Load Axios module to allow handle http get & post
 import { MyObjectsDefinitions, BasicStates, buildCommon } from './lib/stateDefinitions';
 
