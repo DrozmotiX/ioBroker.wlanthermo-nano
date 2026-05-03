@@ -93,6 +93,8 @@ If you like my work, please feel free to provide a personal donation
 ### 0.0.2
 * (DutchmanNL) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 
