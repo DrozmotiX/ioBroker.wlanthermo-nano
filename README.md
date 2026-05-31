@@ -35,6 +35,10 @@ If you like my work, please feel free to provide a personal donation
 [![Donate](https://raw.githubusercontent.com/DrozmotiX/ioBroker.wled/master/admin/button.png)](http://paypal.me/DutchmanNL)
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
+
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
 * (DutchmanNL) Error logging and reporting improved
