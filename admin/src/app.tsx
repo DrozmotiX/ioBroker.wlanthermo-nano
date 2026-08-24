@@ -6,6 +6,17 @@ import Settings from './components/settings';
 import { GenericAppProps, GenericAppSettings } from '@iobroker/adapter-react/types';
 import { StyleRules } from '@material-ui/core/styles';
 
+import translationsEn from './i18n/en.json';
+import translationsDe from './i18n/de.json';
+import translationsRu from './i18n/ru.json';
+import translationsPt from './i18n/pt.json';
+import translationsNl from './i18n/nl.json';
+import translationsFr from './i18n/fr.json';
+import translationsIt from './i18n/it.json';
+import translationsEs from './i18n/es.json';
+import translationsPl from './i18n/pl.json';
+import translationsZhCn from './i18n/zh-cn.json';
+
 const styles = (_theme: Theme): StyleRules => ({
 	root: {},
 });
@@ -16,16 +27,16 @@ class App extends GenericApp {
 			...props,
 			encryptedFields: [],
 			translations: {
-				en: require('./i18n/en.json'),
-				de: require('./i18n/de.json'),
-				ru: require('./i18n/ru.json'),
-				pt: require('./i18n/pt.json'),
-				nl: require('./i18n/nl.json'),
-				fr: require('./i18n/fr.json'),
-				it: require('./i18n/it.json'),
-				es: require('./i18n/es.json'),
-				pl: require('./i18n/pl.json'),
-				'zh-cn': require('./i18n/zh-cn.json'),
+				en: translationsEn,
+				de: translationsDe,
+				ru: translationsRu,
+				pt: translationsPt,
+				nl: translationsNl,
+				fr: translationsFr,
+				it: translationsIt,
+				es: translationsEs,
+				pl: translationsPl,
+				'zh-cn': translationsZhCn,
 			},
 		};
 		super(props, extendedProps);
