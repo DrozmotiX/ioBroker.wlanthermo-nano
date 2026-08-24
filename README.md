@@ -44,6 +44,7 @@ If you like my work, please feel free to provide a personal donation
 	### __WORK IN PROGRESS__
 -->
 ### __WORK IN PROGRESS__
+* (DutchmanNL) Dependencies updated to current versions
 * (DutchmanNL) Maintenance: raise Node.js to 22, modernise CI and release tooling, update dependencies, resolve repository checker findings
 
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
