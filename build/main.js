@@ -14,6 +14,10 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
@@ -35,6 +39,9 @@ class WlanthermoNano extends utils.Adapter {
     this.on("stateChange", this.onStateChange.bind(this));
     this.on("unload", this.onUnload.bind(this));
   }
+  /**
+   * Is called when databases are connected and adapter received configuration.
+   */
   async onReady() {
     this.setState("info.connection", false, true);
     const devices = this.config.deviceList;
@@ -180,8 +187,7 @@ class WlanthermoNano extends utils.Adapter {
       const device = activeDevices[ip].basicInfo;
       const url = `http://${device.username}:${device.password}@${device.ip}`;
       const response_settings = await (0, import_axios.default)(url + "/settings", { timeout: 5e3 });
-      if (response_settings == null || response_settings.data == null)
-        return;
+      if (response_settings == null || response_settings.data == null) return;
       this.log.debug(`${ip} data | ${JSON.stringify(response_settings.data)}`);
       const responseData = response_settings.data;
       activeDevices[device.ip].deviceURL = url;
@@ -285,6 +291,9 @@ class WlanthermoNano extends utils.Adapter {
       this.errorHandler(`[setObjectAndState]`, error);
     }
   }
+  /**
+   * Is called when adapter shuts down - callback has to be called under any circumstances!
+   */
   onUnload(callback) {
     try {
       if (activeDevices != null) {
@@ -309,8 +318,7 @@ class WlanthermoNano extends utils.Adapter {
   }
   errorHandler(source, error, debugMode) {
     let message = error;
-    if (error instanceof Error && error.stack != null)
-      message = error.stack;
+    if (error instanceof Error && error.stack != null) message = error.stack;
     if (!debugMode) {
       this.log.error(`${source} ${error}`);
       this.sendSentry(`${source} ${message}`);
@@ -319,6 +327,9 @@ class WlanthermoNano extends utils.Adapter {
       this.log.debug(`${source} ${message}`);
     }
   }
+  /**
+   * Is called if a subscribed state changes
+   */
   async onStateChange(id, state) {
     try {
       if (state) {
@@ -375,8 +386,7 @@ class WlanthermoNano extends utils.Adapter {
           } else if (deviceId[3] === "Pitmaster") {
             try {
               if ([deviceId[4]].toString() === "Profiles") {
-                if (deviceId[6].toString() === "id")
-                  return;
+                if (deviceId[6].toString() === "id") return;
                 const profileID = parseInt(deviceId[5].replace("Profile_", "")) - 1;
                 const currentProfiles = activeDevices[deviceIP].settings.pid;
                 currentProfiles[profileID][deviceId[6]] = state.val;
@@ -415,8 +425,7 @@ class WlanthermoNano extends utils.Adapter {
   async sendArray(url, array, type) {
     try {
       this.log.debug(`Send array ${type} ${JSON.stringify(array)}`);
-      if (url == null)
-        return;
+      if (url == null) return;
       const post_url = `${url}${type}`;
       const respons = import_axios.default.post(post_url, array);
       return respons;

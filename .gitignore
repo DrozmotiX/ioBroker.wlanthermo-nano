@@ -11,6 +11,10 @@ nbproject
 iobroker.*.tgz
 
 Thumbs.db
+.DS_Store
+
+# Release script commit info
+.commitinfo
 
 # NYC coverage files
 coverage
