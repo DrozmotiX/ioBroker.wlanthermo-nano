@@ -335,7 +335,7 @@ class WlanthermoNano extends utils.Adapter {
 					type: obj.type,
 					common: JSON.parse(JSON.stringify(obj.common)),
 					native: JSON.parse(JSON.stringify(obj.native)),
-				});
+				} as ioBroker.PartialObject);
 				// Remember created object for this runtime
 				createdObjs.push(`${rootDIR}.${stateName}`);
 			}

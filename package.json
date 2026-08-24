@@ -9,25 +9,33 @@
   "homepage": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano",
   "license": "MIT",
   "keywords": [
-    "iobroker-adapter"
+    "iobroker-adapter",
+    "ioBroker",
+    "WLANThermo",
+    "barbecue",
+    "sensor"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/DrozmotiX/ioBroker.wlanthermo-nano"
   },
+  "engines": {
+    "node": ">= 22"
+  },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.3.2",
-    "axios": "^0.27.2"
+    "@iobroker/adapter-core": "^3.4.1",
+    "axios": "^1.12.2"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "3.5.9",
-    "@alcalzone/release-script-plugin-iobroker": "3.5.9",
-    "@alcalzone/release-script-plugin-license": "3.5.9",
-    "@iobroker/adapter-dev": "^1.0.1",
+    "@alcalzone/release-script": "^5.2.1",
+    "@alcalzone/release-script-plugin-iobroker": "^5.2.0",
+    "@alcalzone/release-script-plugin-license": "^5.2.2",
+    "@alcalzone/release-script-plugin-manual-review": "^5.2.0",
+    "@iobroker/adapter-dev": "^1.5.0",
     "@iobroker/adapter-react": "2.2.4",
-    "@iobroker/testing": "^5.1.1",
+    "@iobroker/testing": "^5.2.2",
     "@material-ui/core": "^4.12.4",
-    "@types/node": "^17.0.38",
+    "@types/node": "^22.10.0",
     "@types/react": "^17.0.45",
     "@types/react-dom": "^17.0.17",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
@@ -42,7 +50,7 @@
     "react-dom": "^17.0.2",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.21",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "~4.9.5"
   },
   "main": "build/main.js",
@@ -74,7 +82,8 @@
     "coverage": "nyc npm run test:ts",
     "lint": "eslint --ext .ts,.tsx src/ admin/src/",
     "translate": "translate-adapter",
-    "release": "release-script"
+    "release": "release-script --all --branchPattern '*'",
+    "release-dry": "release-script --all --dry"
   },
   "nyc": {
     "include": [
