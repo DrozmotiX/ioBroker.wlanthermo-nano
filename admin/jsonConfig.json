@@ -17,10 +17,10 @@
       "xl": 12,
       "type": "table",
       "items": [
-        {"type": "text", "width": 2, "title": {"en": "ip-address"}, "attr": "ip", "filter": false, "sort": true, "default": ""},
-        {"type": "text", "width": 2, "title": {"en": "username"}, "attr": "username", "filter": false, "sort": true, "default": ""},
-        {"type": "password", "repeat": false, "width": 2, "title": {"en": "password"}, "attr": "password", "filter": false, "sort": true, "default": ""},
-        {"type": "number", "width": 2, "title": {"en": "interval in seconds"}, "attr": "interval", "filter": false, "sort": true, "default": 30}
+        {"type": "text", "width": 2, "title": "IP-Address", "attr": "ip", "filter": false, "sort": true, "default": ""},
+        {"type": "text", "width": 2, "title": "Username", "attr": "username", "filter": false, "sort": true, "default": ""},
+        {"type": "password", "repeat": false, "width": 2, "title": "Password", "attr": "password", "filter": false, "sort": true, "default": ""},
+        {"type": "number", "width": 2, "title": "Interval in seconds", "attr": "interval", "filter": false, "sort": true, "default": 30}
       ]
     }
   }

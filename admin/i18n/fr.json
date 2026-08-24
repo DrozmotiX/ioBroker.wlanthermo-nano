@@ -1,0 +1,7 @@
+{
+    "Please provide IP-Address and logon credentials of WLANThermo-Nano device": "Veuillez fournir l'adresse IP et les identifiants de connexion de l'appareil WLANThermo-Nano",
+    "IP-Address": "Adresse IP",
+    "Username": "Nom d'utilisateur",
+    "Password": "Mot de passe",
+    "Interval in seconds": "Intervalle en secondes"
+}

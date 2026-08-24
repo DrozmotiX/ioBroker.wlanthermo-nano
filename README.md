@@ -46,6 +46,7 @@ If you like my work, please feel free to provide a personal donation
 ### __WORK IN PROGRESS__
 * (DutchmanNL) Dependencies updated to current versions
 * (DutchmanNL) Maintenance: raise Node.js to 22, modernise CI and release tooling, update dependencies, resolve repository checker findings
+* (DutchmanNL) Admin settings are translated again: added the missing admin/i18n files for all 11 supported languages, including Ukrainian, and the device table column headers are now translated too
 
 ### 0.2.1 (2022-06-08) - Initialization error for Nano V1 solved
 * (DutchmanNL) Initialization error for Nano V1 solved
